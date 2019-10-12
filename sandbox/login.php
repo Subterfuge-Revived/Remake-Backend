@@ -1,6 +1,6 @@
 <?php
 
-    require("utils_security.php");
+require("utils_security.php");
     require("utils_database.php");
     require("session.php");
     require("utils_json.php");
@@ -55,6 +55,7 @@ WHERE player_name=?");
 
                     $session_id = $ses->generate_session_login($con, $player_id);
                     $json->success_login($player_id, $player_name, $session_id);
+
                 }
             } else {
                 $json->fail_msg($str_incorrect_password);

@@ -1,5 +1,6 @@
 <?php
 
+    use mofodojodino\ProfanityFilter\Check;
     use PHPMailer\PHPMailer\PHPMailer;
     use PHPMailer\PHPMailer\Exception;
 
@@ -14,6 +15,7 @@
     $db = new utils_database();
     $json = new utils_json();
     $ses = new session();
+    $check = new Check();
 
     $player_name = $sec->rm_inject($_POST["username"]);
     $mail_address = $sec->rm_inject($_POST["email"]);
@@ -26,6 +28,7 @@
     $str_mail_taken = "This mail address is already taken";
     $str_registration_successful = "Registration successful";
     $str_invalid_registration_details = "Invalid registration details";
+    $str_player_name_bad_words = "Player name content inappropriate";
 
     // Salted password hashing
     $password = password_hash($password, PASSWORD_DEFAULT);
@@ -38,6 +41,9 @@
             && strlen($password) > 5) {
 
             throw new \Exception($str_invalid_registration_details);
+        } else if($check->hasProfanity($player_name)) {
+
+            throw new \Exception($str_player_name_bad_words);
         } else {
 
             $con = $db->new_connection();
@@ -96,6 +102,7 @@ VALUES (?,?,?)
 
             $session_id = $ses->generate_session_login($con, $player_id);
             $json->success_login($player_id, $player_name, $session_id);
+
         }
     } catch(\Exception $e) {
         $json->fail_msg($e->getMessage());

@@ -23,6 +23,7 @@ ON DUPLICATE KEY UPDATE player_id=VALUES(player_id),session_id=VALUES(session_id
             }
 
             return $session_id;
+
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
