@@ -7,11 +7,15 @@
 
     require("utils_security.php");
     require("utils_database.php");
+    require("utils_json.php");
+    require("session.php");
 
     $sec = new utils_security();
     $db = new utils_database();
+    $json = new utils_json();
+    $ses = new session();
 
-    $username = $sec->rm_inject($_POST["username"]);
+    $player_name = $sec->rm_inject($_POST["username"]);
     $mail_address = $sec->rm_inject($_POST["email"]);
     $password = $sec->rm_inject($_POST["password"]);
 
@@ -29,7 +33,7 @@
     try{
         // Validate if fields are populated correctly
         if(!filter_var($mail_address, FILTER_VALIDATE_EMAIL)
-            && !empty($username)
+            && !empty($player_name)
             && !empty($password)
             && strlen($password) > 5) {
 
@@ -40,11 +44,11 @@
 
             // Check whether username is already registered
             $stmt_usr = $con->prepare("
-SELECT playername 
+SELECT player_name 
 FROM sandbox.player_administrative_info 
-WHERE playername=?
+WHERE player_name=?
 ");
-            $stmt_usr->bind_param("s", $username);
+            $stmt_usr->bind_param("s", $player_name);
 
             if((!$stmt_usr->execute())) {
                 throw new \Exception($stmt_usr->error);
@@ -77,19 +81,24 @@ WHERE mail=?
 
             // Add new player to player_administrative_info
             $stmt = $con->prepare("
-INSERT INTO sandbox.player_administrative_info (playername, password, mail) 
+INSERT INTO sandbox.player_administrative_info (player_name, password, mail) 
 VALUES (?,?,?)
 ");
-            $stmt->bind_param("sss", $username, $password, $mail_address);
+            $stmt->bind_param("sss", $player_name, $password, $mail_address);
 
             if(!$stmt->execute()) {
                 throw new \Exception($stmt->error);
             }
 
-            echo $str_registration_successful;
+            $stmt->store_result();
+
+            $player_id = $con->insert_id;
+
+            $session_id = $ses->generate_session_login($con, $player_id);
+            $json->success_login($player_id, $player_name, $session_id);
         }
     } catch(\Exception $e) {
-        echo $e->getMessage();
+        $json->fail_msg($e->getMessage());
     } finally {
 
         $stmt->close();

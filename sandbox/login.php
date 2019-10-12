@@ -3,12 +3,14 @@
     require("utils_security.php");
     require("utils_database.php");
     require("session.php");
+    require("utils_json.php");
 
     $sec = new utils_security();
     $db = new utils_database();
     $ses = new session();
+    $json = new utils_json();
 
-    $username = $sec->rm_inject(($_POST["username"]));
+    $player_name = $sec->rm_inject(($_POST["username"]));
     $password = $sec->rm_inject($_POST["password"]);
 
     /*
@@ -18,9 +20,9 @@
     $str_player_not_found= "Could not find player";
     $str_missing_user_psw = "Missing username or password";
 
-    if(empty($username) || empty($password)) {
+    if(empty($player_name) || empty($password)) {
 
-        echo $str_missing_user_psw;
+        $json->fail_msg($str_missing_user_psw);
     } else {
 
         $con = $db->new_connection();
@@ -28,9 +30,9 @@
         $stmt = $con->prepare("
 SELECT password 
 FROM sandbox.player_administrative_info 
-WHERE playername=?
+WHERE player_name=?
 ");
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param("s", $player_name);
         $stmt->execute();
         $stmt->store_result();
         $stmt->bind_result($res_password_hash);
@@ -39,13 +41,26 @@ WHERE playername=?
 
             if(password_verify($password, $res_password_hash)){
 
-                $ses->generate_session_login($con, $username);
+                $stmt = $con->prepare("
+SELECT id 
+FROM sandbox.player_administrative_info
+WHERE player_name=?");
+
+                $stmt->bind_param("s", $player_name);
+                $stmt->execute();
+                $stmt->store_result();
+                $stmt->bind_result($player_id);
+
+                if($stmt->fetch()) {
+
+                    $session_id = $ses->generate_session_login($con, $player_id);
+                    $json->success_login($player_id, $player_name, $session_id);
+                }
             } else {
-                echo $str_incorrect_password;
+                $json->fail_msg($str_incorrect_password);
             }
         } else {
-
-            echo $str_player_not_found;
+            $json->fail_msg($str_player_not_found);
         }
         $stmt->close();
         $con->close();
