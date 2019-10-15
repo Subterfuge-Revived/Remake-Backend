@@ -1,13 +1,12 @@
 <?php
 
-require("utils_security.php");
+    require("utils_security.php");
     require("utils_database.php");
-    require("session.php");
     require("utils_json.php");
+    require("utils_session.php");
 
     $sec = new utils_security();
-    $db = new utils_database();
-    $ses = new session();
+    $ses = new utilsSession();
     $json = new utils_json();
 
     $player_name = $sec->rm_inject(($_POST["username"]));
@@ -16,8 +15,8 @@ require("utils_security.php");
     /*
      * Constants
      */
-    $str_incorrect_password= "Incorrect password";
-    $str_player_not_found= "Could not find player";
+    $str_incorrect_password = "Incorrect password";
+    $str_player_not_found = "Could not find player";
     $str_missing_user_psw = "Missing username or password";
 
     if(empty($player_name) || empty($password)) {
@@ -25,7 +24,7 @@ require("utils_security.php");
         $json->fail_msg($str_missing_user_psw);
     } else {
 
-        $con = $db->new_connection();
+        $con = utils_database::new_connection();
 
         $stmt = $con->prepare("
 SELECT password 
@@ -55,7 +54,6 @@ WHERE player_name=?");
 
                     $session_id = $ses->generate_session_login($con, $player_id);
                     $json->success_login($player_id, $player_name, $session_id);
-
                 }
             } else {
                 $json->fail_msg($str_incorrect_password);

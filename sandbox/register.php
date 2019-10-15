@@ -9,12 +9,11 @@
     require("utils_security.php");
     require("utils_database.php");
     require("utils_json.php");
-    require("session.php");
+    require("utils_session.php");
 
     $sec = new utils_security();
-    $db = new utils_database();
     $json = new utils_json();
-    $ses = new session();
+    $ses = new utilsSession();
     $check = new Check();
 
     $player_name = $sec->rm_inject($_POST["username"]);
@@ -29,6 +28,7 @@
     $str_registration_successful = "Registration successful";
     $str_invalid_registration_details = "Invalid registration details";
     $str_player_name_bad_words = "Player name content inappropriate";
+    $int_initial_rating = 1200;
 
     // Salted password hashing
     $password = password_hash($password, PASSWORD_DEFAULT);
@@ -46,7 +46,7 @@
             throw new \Exception($str_player_name_bad_words);
         } else {
 
-            $con = $db->new_connection();
+            $con = utils_database::new_connection();
 
             // Check whether username is already registered
             $stmt_usr = $con->prepare("
@@ -99,6 +99,18 @@ VALUES (?,?,?)
             $stmt->store_result();
 
             $player_id = $con->insert_id;
+
+            $stmt = $con->prepare("
+INSERT INTO sandbox.player_statistics (player_id, rating, last_online)
+VALUES (?,?, NOW())
+");
+            $stmt->bind_param("ii", $player_id, $int_initial_rating);
+
+            if(!$stmt->execute()) {
+                throw new \Exception($stmt->error);
+            }
+
+            $stmt->store_result();
 
             $session_id = $ses->generate_session_login($con, $player_id);
             $json->success_login($player_id, $player_name, $session_id);
