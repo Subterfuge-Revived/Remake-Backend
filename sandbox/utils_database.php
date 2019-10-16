@@ -9,13 +9,31 @@ class utils_database
     private $bind_res = [];
     private $bind_req = [];
 
-    public $num_rows;
+    private $error_if_num_row_zero;
+    private $error_if_num_row_zero_msg;
+
+    private $error_if_num_row_not_zero;
+    private $error_if_num_row_not_zero_msg;
+
+    private $num_rows;
+    private $insert_id;
 
     public function __construct(mysqli &$con) {
 
         $this->con = $con;
+        $this->error_if_num_row_zero = false;
 
         return $this;
+    }
+
+    public function getNumRows()
+    {
+        return $this->num_rows;
+    }
+
+    public function getInsertId()
+    {
+        return $this->insert_id;
     }
 
     public function bind_res(&...$bind_res) {
@@ -32,12 +50,40 @@ class utils_database
         return $this;
     }
 
+    public function error_num_row_zero($error_message) {
+
+        $this->error_if_num_row_zero = true;
+        $this->error_if_num_row_zero_msg = $error_message;
+
+        return $this;
+    }
+
+    public function error_num_row_not_zero($error_message) {
+
+        $this->error_if_num_row_not_zero = true;
+        $this->error_if_num_row_not_zero_msg = $error_message;
+
+        return $this;
+    }
+
+    private function flush() {
+
+        $this->bind_res = null;
+        $this->bind_req = null;
+        $this->error_if_num_row_zero = null;
+        $this->error_if_num_row_zero_msg = null;
+        $this->error_if_num_row_not_zero = null;
+        $this->error_if_num_row_not_zero_msg = null;
+    }
+
     public function exec_db($stmt) {
 
         try {
             $var_types = "";
 
-            foreach ($this->bind_req as $var) {
+            $js = new utils_json();
+
+            foreach ( $this->bind_req as $var ) {
 
                 if(is_int($var)) {
 
@@ -59,8 +105,15 @@ class utils_database
             $p = $run->get_result();
 
             $this->num_rows = $p->num_rows;
+            $this->insert_id = $this->con->insert_id;
 
-            if($this->num_rows > 1) {
+            if( $this->error_if_num_row_zero && $this->num_rows == 0 ) {
+
+               $js->fail_msg($this->error_if_num_row_zero_msg);
+            } else if( $this->error_if_num_row_not_zero && $this->num_rows > 0) {
+
+                $js->fail_msg($this->error_if_num_row_not_zero_msg);
+            } else if( $this->num_rows > 1 ) {
 
                 for($i = 0; $i < count($this->bind_res); $i++) {
 
@@ -68,13 +121,16 @@ class utils_database
                 }
             }
 
-            while($row = $p->fetch_row()) {
+            while( $row = $p->fetch_row() ) {
 
-                for($column = 0; $column < count($row); $column++) {
+                for( $column = 0; $column < count($row); $column++ ) {
 
                     ($this->num_rows > 1) ? array_push($this->bind_res[$column], $row[$column]) : $this->bind_res[$column] = $row[$column];
                 }
             }
+
+            $this->flush();
+
         } catch (\Exception $e) {
 
             echo $e->getMessage();

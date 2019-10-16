@@ -12,8 +12,8 @@
     /*
      * Input
      */
-    $player_name = $sec->rm_inject($_POST["player_name"]);
-    $password    = $sec->rm_inject($_POST["password"]);
+    $in_player_name = $sec->rm_inject($_POST["player_name"]);
+    $in_password    = $sec->rm_inject($_POST["password"]);
 
     /*
      * Constants
@@ -26,7 +26,7 @@
     try{
 
         // Check if player_name or password empty
-        if( empty($player_name) || empty($password) ) {
+        if( empty($in_player_name) || empty($in_password) ) {
 
             throw new \Exception($out_missing_player_psw);
         }
@@ -34,32 +34,25 @@
         // Connect to sandbox database
         $db = new utils_database(utils_database::new_connection());
 
-        // Fetch player id and password
-        $db->bind_req($player_name)
+        // Fetch player id and password, if player exits error out
+        $db->bind_req($in_player_name)
             ->bind_res($db_player_id, $db_player_password)
+            ->error_num_row_zero($out_player_not_found)
             ->exec_db("
-            SELECT player_administrative_info.id, player_administrative_info.password
-            FROM sandbox.player_administrative_info
-            WHERE player_administrative_info.player_name = ?");
-
-        // Check if player exists
-        if( !$db->num_rows ) {
-
-            throw new \Exception($out_player_not_found);
-        }
+            SELECT  player_administrative_info.id, player_administrative_info.password
+            FROM    sandbox.player_administrative_info
+            WHERE   player_administrative_info.player_name = ?");
 
         // Check if password matches
-        if( !password_verify($password, $db_player_password) ) {
+        if( !password_verify($in_password, $db_player_password) ) {
 
             throw new \Exception($out_incorrect_password);
         }
 
         $session_id = $ses->reworked_generate_session_login($db, $db_player_id);
-        $json->success_login($db_player_id, $player_name, $session_id);
+        $json->success_login($db_player_id, $in_player_name, $session_id);
 
     } catch (\Exception $e) {
 
         $json->fail_msg($e->getMessage());
     }
-
-
