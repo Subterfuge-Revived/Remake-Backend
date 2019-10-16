@@ -8,7 +8,7 @@ require("utils_json.php");
 require("utils_session.php");
 
 $sec = new utils_security();
-$ses = new utilsSession();
+$ses = new utils_session();
 $json = new utils_json();
 
 $session_id = $sec->rm_inject(($_POST["session_id"]));

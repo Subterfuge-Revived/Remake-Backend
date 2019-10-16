@@ -1,6 +1,6 @@
 <?php
 
-class utilsSession
+class utils_session
 {
 
     public function generate_session_login(mysqli $con, $player_id)
@@ -28,6 +28,28 @@ ON DUPLICATE KEY UPDATE player_id=VALUES(player_id),session_id=VALUES(session_id
 
         } catch (\Exception $e) {
             echo $e->getMessage();
+        }
+    }
+
+    public function reworked_generate_session_login(utils_database $db, $player_id) {
+
+        try {
+
+            // Generate unique session id
+            $session_id = bin2hex(openssl_random_pseudo_bytes(40));
+
+            // Insert new session id for player
+            $db->bind_req($player_id, $session_id)
+                ->exec_db("
+                INSERT INTO sandbox.player_session (player_id, session_id, valid_until)
+                VALUES (?,?,DATE_ADD(NOW(), INTERVAL 30 MINUTE))
+                ON DUPLICATE KEY UPDATE player_id = VALUES(player_id), session_id = VALUES(session_id), valid_until = VALUES(valid_until)");
+
+            return $session_id;
+
+        } catch (\Exception $e) {
+            $json = new utils_json();
+            $json->fail_msg($e);
         }
     }
 

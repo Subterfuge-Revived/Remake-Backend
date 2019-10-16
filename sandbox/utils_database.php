@@ -25,7 +25,7 @@ class utils_database
         return $this;
     }
 
-    public function bind_req(...$bind_req) {
+    public function bind_req(&...$bind_req) {
 
         $this->bind_req = $bind_req;
 
@@ -53,10 +53,9 @@ class utils_database
 
             $run = $this->con->prepare($stmt);
 
-            $run->bind_param($var_types, $this->bind_req);
+            call_user_func_array(array($run, "bind_param"), array_merge(array($var_types), $this->bind_req));
 
             $run->execute();
-
             $p = $run->get_result();
 
             $this->num_rows = $p->num_rows;

@@ -6,10 +6,10 @@
     require("utils_session.php");
 
     $sec = new utils_security();
-    $ses = new utilsSession();
+    $ses = new utils_session();
     $json = new utils_json();
 
-    $player_name = $sec->rm_inject(($_POST["username"]));
+    $player_name = $sec->rm_inject(($_POST["player_name"]));
     $password = $sec->rm_inject($_POST["password"]);
 
     /*

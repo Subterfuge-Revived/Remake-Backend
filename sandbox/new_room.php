@@ -10,7 +10,7 @@
     require("utils_session.php");
 
     $sec = new utils_security();
-    $ses = new utilsSession();
+    $ses = new utils_session();
     $json = new utils_json();
     $check = new Check();
 

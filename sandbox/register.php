@@ -13,7 +13,7 @@
 
     $sec = new utils_security();
     $json = new utils_json();
-    $ses = new utilsSession();
+    $ses = new utils_session();
     $check = new Check();
 
     $player_name = $sec->rm_inject($_POST["username"]);
