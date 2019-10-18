@@ -52,7 +52,7 @@
             $stmt_usr = $con->prepare("
 SELECT player_name 
 FROM sandbox.player_administrative_info 
-WHERE player_name=?
+WHERE LOWER(player_name)=LOWER(?)
 ");
             $stmt_usr->bind_param("s", $player_name);
 

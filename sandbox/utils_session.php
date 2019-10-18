@@ -3,6 +3,27 @@
 class utils_session
 {
 
+    private $db;
+    private $player_id;
+
+    /*
+    * Constants
+    */
+    private $str_invalid_session = "Invalid session. Authentication required";
+
+    public function __construct(utils_database $db) {
+
+        $this->db = $db;
+        $this->player_id = null;
+
+        return $this;
+    }
+
+    public function getPlayerId() {
+
+        return $this->player_id;
+    }
+
     public function generate_session_login(mysqli $con, $player_id)
     {
 
@@ -48,8 +69,9 @@ ON DUPLICATE KEY UPDATE player_id=VALUES(player_id),session_id=VALUES(session_id
             return $session_id;
 
         } catch (\Exception $e) {
+
             $json = new utils_json();
-            $json->fail_msg($e);
+            $json->fail_msg($e->getMessage());
         }
     }
 
@@ -77,6 +99,33 @@ WHERE session_id=? AND NOW() <= valid_until
             }
         } catch(\Exception $e) {
             $e->getMessage();
+        }
+    }
+
+    public function reworked_is_session_valid($session_id) {
+
+        try {
+
+            $this->db
+                ->bind_req($session_id)
+                ->bind_res($res_player_id)
+                ->exec_db("
+                SELECT player_id FROM sandbox.player_session
+                WHERE session_id=? AND NOW() <= valid_until");
+
+            if( $this->db->getNumRows() === 0 ) {
+
+                throw new \Exception($this->str_invalid_session);
+            }
+
+            $this->player_id = $res_player_id;
+
+            return $this;
+
+        } catch (\Exception $e) {
+
+            $json = new utils_json();
+            $json->fail_msg($e->getMessage());
         }
     }
 }

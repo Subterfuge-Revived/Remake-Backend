@@ -2,14 +2,14 @@
 
     use mofodojodino\ProfanityFilter\Check;
 
+    require '/var/www/PHPMailer/vendor/autoload.php';
     require ("utils_security.php");
     require ("utils_database.php");
     require ("utils_json.php");
     require ("utils_session.php");
 
-    $sec = new utils_security();
-    $json = new utils_json();
-    $ses = new utils_session();
+    $sec   = new utils_security();
+    $json  = new utils_json();
     $check = new Check();
 
     /*
@@ -27,19 +27,18 @@
     $out_player_name_taken   = "[register] This player name is already taken";
     $out_mail_address_taken  = "[register] This mail address is already taken";
     $var_str_initial_rating  = 1200;
+    $var_name_min_length     = 4;
+    $var_psw_min_length      = 2;
 
     // Begin
     try {
 
-        // Password hashing
-        $in_password = password_hash($in_password, PASSWORD_DEFAULT);
-
         // Check if valid format for: mail address, player name and password
         if( !filter_var($in_mail_addr, FILTER_VALIDATE_EMAIL)
-            && !empty($in_player_name)
-            && strlen($in_player_name) >= 4
-            && !empty($in_password)
-            && strlen($in_password) >= 6 ) {
+            || empty($in_player_name)
+            || strlen($in_player_name) < $var_name_min_length
+            || empty($in_password)
+            || strlen($in_password) < $var_psw_min_length ) {
 
             throw new \Exception($out_invalid_reg_details);
         }
@@ -48,6 +47,9 @@
 
             throw new \Exception($out_bad_player_name);
         } else {
+
+            // Password hashing
+            $in_password = password_hash($in_password, PASSWORD_DEFAULT);
 
             // Connect to sandbox database
             $db = new utils_database(utils_database::new_connection());
@@ -58,7 +60,7 @@
                 ->exec_db("
                 SELECT player_administrative_info.player_name
                 FROM sandbox.player_administrative_info
-                WHERE player_administrative_info.player_name = ?");
+                WHERE LOWER(player_administrative_info.player_name) = LOWER(?)");
 
             // Check is mail is already taken
             $db->bind_req($in_mail_addr)
@@ -66,7 +68,8 @@
                 ->exec_db("
                 SELECT player_administrative_info.mail
                 FROM sandbox.player_administrative_info
-                WHERE player_administrative_info.mail = ?");
+                WHERE LOWER(player_administrative_info.mail) = LOWER(?)");
+
 
             // Add new player
             $db->bind_req($in_player_name, $in_password, $in_mail_addr)
@@ -82,7 +85,7 @@
                 INSERT INTO sandbox.player_statistics (player_id, rating, last_online)
                 VALUES (?,?, NOW())");
 
-            $func_session_id = $ses->reworked_generate_session_login($db, $func_player_id);
+            $func_session_id = (new utils_session($db))->reworked_generate_session_login($db, $func_player_id);
             $json->success_login($func_player_id, $in_player_name, $func_session_id);
         }
     } catch (\Exception $e) {

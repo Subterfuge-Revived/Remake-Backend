@@ -78,66 +78,59 @@ class utils_database
 
     public function exec_db($stmt) {
 
-        try {
-            $var_types = "";
+        $var_types = "";
 
-            $js = new utils_json();
+        foreach ( $this->bind_req as $var ) {
 
-            foreach ( $this->bind_req as $var ) {
+            if(is_int($var)) {
 
-                if(is_int($var)) {
+                $var_types = $var_types . "i";
+            } elseif (is_double($var)) {
 
-                    $var_types = $var_types . "i";
-                } elseif (is_double($var)) {
+                $var_types = $var_types . "d";
+            } else {
 
-                    $var_types = $var_types . "d";
-                } else {
-
-                    $var_types = $var_types . "s";
-                }
+                $var_types = $var_types . "s";
             }
-
-            $run = $this->con->prepare($stmt);
-
-            call_user_func_array(array($run, "bind_param"), array_merge(array($var_types), $this->bind_req));
-
-            $run->execute();
-            $p = $run->get_result();
-
-            $this->num_rows = $p->num_rows;
-            $this->insert_id = $this->con->insert_id;
-
-            if( $this->error_if_num_row_zero && $this->num_rows == 0 ) {
-
-               $js->fail_msg($this->error_if_num_row_zero_msg);
-            } else if( $this->error_if_num_row_not_zero && $this->num_rows > 0) {
-
-                $js->fail_msg($this->error_if_num_row_not_zero_msg);
-            } else if( $this->num_rows > 1 ) {
-
-                for($i = 0; $i < count($this->bind_res); $i++) {
-
-                    $this->bind_res[$i] = [];
-                }
-            }
-
-            while( $row = $p->fetch_row() ) {
-
-                for( $column = 0; $column < count($row); $column++ ) {
-
-                    ($this->num_rows > 1) ? array_push($this->bind_res[$column], $row[$column]) : $this->bind_res[$column] = $row[$column];
-                }
-            }
-
-            $this->flush();
-
-        } catch (\Exception $e) {
-
-            echo $e->getMessage();
-        } finally {
-
-            return $this;
         }
+
+        $run = $this->con->prepare($stmt);
+
+        call_user_func_array(array($run, "bind_param"), array_merge(array($var_types), $this->bind_req));
+
+        $run->execute();
+
+        $p = $run->get_result();
+
+        $this->num_rows = $p->num_rows;
+        $this->insert_id = $this->con->insert_id;
+
+        if( $this->error_if_num_row_zero && $this->num_rows == 0 ) {
+
+            throw new \Exception($this->error_if_num_row_zero_msg);
+        } else if( $this->error_if_num_row_not_zero && $this->num_rows > 0 ) {
+
+            throw new \Exception($this->error_if_num_row_not_zero_msg);
+        } else if( $this->num_rows > 1 ) {
+
+            for($i = 0; $i < count($this->bind_res); $i++) {
+
+                $this->bind_res[$i] = [];
+            }
+        }
+
+        while( !($p === false) && $row = $p->fetch_row() ) {  // !($p === false) because fetching will fail after INSERT query
+
+            for( $column = 0; $column < count($row); $column++ ) {
+
+                ($this->num_rows > 1) ? array_push($this->bind_res[$column], $row[$column]) : $this->bind_res[$column] = $row[$column];
+            }
+        }
+
+        $this->flush();
+
+        return $this;
+
     }
 
     public static function new_connection() {

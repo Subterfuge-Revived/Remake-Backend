@@ -6,7 +6,6 @@
     require ("utils_session.php");
 
     $sec  = new utils_security();
-    $ses  = new utils_session();
     $json = new utils_json();
 
     /*
@@ -49,7 +48,7 @@
             throw new \Exception($out_incorrect_password);
         }
 
-        $session_id = $ses->reworked_generate_session_login($db, $db_player_id);
+        $session_id = (new utils_session($db))->reworked_generate_session_login($db, $db_player_id);
         $json->success_login($db_player_id, $in_player_name, $session_id);
 
     } catch (\Exception $e) {
