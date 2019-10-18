@@ -56,6 +56,7 @@
 
             $func_player_id = $func_ses->getPlayerId();
 
+            // Check if game is rated
             if( $in_rated === 1 ) {
 
                 $db->bind_req($func_player_id)
@@ -76,6 +77,7 @@
 
             $func_time = time();
 
+            // Insert new open room
             $db->bind_req($func_player_id, $in_rated, $in_max_players, $int_init_player_count,
                 $in_min_rating, $in_description, $in_goal, $in_anonymity, $in_map, $func_time)
                 ->exec_db("
@@ -84,6 +86,7 @@
 
             $func_insert_id = $db->getInsertId();
 
+            // Insert player associated to new open room
             $db->bind_req($func_player_id, $func_insert_id)
                 ->exec_db("
                 INSERT INTO sandbox.player_open_room (player_id, room_id)
