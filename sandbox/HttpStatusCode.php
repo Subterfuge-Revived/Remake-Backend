@@ -1,7 +1,6 @@
 <?php
 
-
-class httpStatusCode extends SplEnum {
+class httpStatusCode {
     const __default = self::OK;
 
     const SWITCHING_PROTOCOLS = 101;

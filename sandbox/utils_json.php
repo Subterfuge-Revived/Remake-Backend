@@ -1,5 +1,6 @@
 <?php
 
+require("httpStatusCode.php");
 
 class utils_json
 {
@@ -16,7 +17,7 @@ class utils_json
         );
 
         echo json_encode($arr);
-        http_response_code(new httpStatusCode(httpStatusCode::OK));
+        http_response_code(httpStatusCode::OK);
     }
 
     public function fail_msg($message) {
@@ -27,7 +28,8 @@ class utils_json
         );
 
         echo json_encode($arr);
-        http_response_code(new httpStatusCode(httpStatusCode::BAD_REQUEST));
+
+        http_response_code(httpStatusCode::BAD_REQUEST);
     }
 
     public function success_new_room($player_id, $rated, $max_players, $int_initial_player_count,
@@ -50,7 +52,7 @@ class utils_json
         );
 
         echo json_encode($arr);
-        http_response_code(new httpStatusCode(httpStatusCode::OK));
+        http_response_code(httpStatusCode::OK);
     }
 
     public function success_join_room($room_id) {
@@ -61,12 +63,12 @@ class utils_json
         );
 
         echo json_encode($arr);
-        http_response_code(new httpStatusCode(httpStatusCode::OK));
+        http_response_code(httpStatusCode::OK);
     }
 
     public function  success_retr_rooms($arr) {
 
         echo json_encode($arr);
-        http_response_code(new httpStatusCode(httpStatusCode::OK));
+        http_response_code(httpStatusCode::OK);
     }
 }

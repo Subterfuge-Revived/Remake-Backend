@@ -94,14 +94,25 @@ class utils_database
             }
         }
 
-        $run = $this->con->prepare($stmt);
+        $statement = $this->con->prepare($stmt);
 
-        call_user_func_array(array($run, "bind_param"), array_merge(array($var_types), $this->bind_req));
+        // Prepare statement can return false. If false, need to return early.
+        // IF false, this usually means the query is incorrect and cannot bind. Look at the SQL to ensure it is correct.
+        if(!$statement) {
+            throw new \Exception("Malformed SQL Exception.");
+        }
 
-        $run->execute();
+        call_user_func_array(array($statement, 'bind_param'), array_merge(array($var_types), $this->bind_req));
 
-        $p = $run->get_result();
+        $statement->execute();
 
+        $p = $statement->get_result();
+
+        if(!$p) {
+            // No results from database.
+            // Likely an update or insert.
+            return;
+        }
         $this->num_rows = $p->num_rows;
         $this->insert_id = $this->con->insert_id;
 
@@ -135,9 +146,10 @@ class utils_database
 
     public static function new_connection() {
         $db_servername = "localhost";
-        $db_username = "";
+        $db_username = "root";
         $db_password = "";
         $db_database = "sandbox";
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         return new mysqli($db_servername, $db_username, $db_password, $db_database);
     }
 
@@ -146,6 +158,7 @@ class utils_database
         $db_username = "";
         $db_password = "";
         $db_database = "events_ongoing_rooms";
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
         return new mysqli($db_servername, $db_username, $db_password, $db_database);
     }
 }

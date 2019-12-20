@@ -1,0 +1,9 @@
+{
+    "name": "subterfuge/php",
+    "description": "Subterfuge Backend",
+    "type": "project",
+    "require": {
+        "mofodojodino/profanity-filter": "^1.3",
+        "myclabs/php-enum": "^1.7"
+    }
+}
