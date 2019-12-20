@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL & ~E_NOTICE);
+require_once "credentials.php";
 
 class utils_database
 {
@@ -130,22 +132,23 @@ class utils_database
         $this->flush();
 
         return $this;
-
     }
 
     public static function new_connection() {
-        $db_servername = "localhost";
-        $db_username = "";
-        $db_password = "";
-        $db_database = "sandbox";
-        return new mysqli($db_servername, $db_username, $db_password, $db_database);
+
+        return self::connect("sandbox");
     }
 
     public static function new_connection_events() {
+
+        return self::connect("events_ongoing_rooms");
+    }
+
+    private static function connect($db_database) {
+        $credentials = new credentials();
         $db_servername = "localhost";
-        $db_username = "";
-        $db_password = "";
-        $db_database = "events_ongoing_rooms";
+        $db_username = $credentials->get_username();
+        $db_password = $credentials->get_password();
         return new mysqli($db_servername, $db_username, $db_password, $db_database);
     }
 }

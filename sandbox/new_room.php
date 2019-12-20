@@ -1,17 +1,5 @@
 <?php
 
-    use mofodojodino\ProfanityFilter\Check;
-
-    require '/var/www/PHPMailer/vendor/autoload.php';
-    require("utils_security.php");
-    require("utils_database.php");
-    require("utils_json.php");
-    require("utils_session.php");
-
-    $sec   = new utils_security();
-    $json  = new utils_json();
-    $check = new Check();
-
     /*
      * Input
      */

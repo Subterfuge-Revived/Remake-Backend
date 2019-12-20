@@ -1,13 +1,5 @@
 <?php
 
-    require ("utils_security.php");
-    require ("utils_database.php");
-    require ("utils_json.php");
-    require ("utils_session.php");
-
-    $sec  = new utils_security();
-    $json = new utils_json();
-
     /*
      * Input
      */

@@ -1,7 +1,5 @@
 <?php
 
-require '/var/www/PHPMailer/vendor/autoload.php';
-
 require("utils_security.php");
 require("utils_database.php");
 require("utils_json.php");

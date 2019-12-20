@@ -1,8 +1,8 @@
 <?php
 
+use MyCLabs\Enum\Enum;
 
-class httpStatusCode extends SplEnum {
-    const __default = self::OK;
+class httpStatusCode extends Enum {
 
     const SWITCHING_PROTOCOLS = 101;
     const OK = 200;
