@@ -28,6 +28,9 @@
     $event_register         = "register";
     $event_create_new_room  = "new_room";
     $event_join_room        = "join_room";
+    $event_leave_room       = "leave_room";
+    $event_start_early      = "start_early";
+    $event_submit_event     = "submit_event";
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
@@ -41,9 +44,21 @@
 
         require_once 'new_room.php';
 
-    } else if ( strcmp($event_type, $event_join_room) == 0 ) {
+    } else if( strcmp($event_type, $event_join_room) == 0 ) {
 
         require_once 'join_room.php';
+
+    } else if( strcmp($event_type, $event_leave_room) == 0 ) {
+
+        require_once 'leave_room.php';
+
+    } else if( strcmp($event_type, $event_start_early) == 0 ) {
+
+        require_once 'start_early.php';
+
+    } else if( strcmp($event_type, $event_submit_event) == 0 ) {
+
+        require_once 'submit_event.php';
 
     }
 

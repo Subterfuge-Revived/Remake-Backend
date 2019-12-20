@@ -17,7 +17,6 @@
      */
     $out_invalid_description = "[new_room] Description contains bad words";
     $out_invalid_input       = "[new_room] Invalid inputs received";
-    $out_invalid_session     = "[new_room] Invalid session. Authentication required";
     $out_invalid_min_rating  = "[new_room] Invalid minimum rating";
     $arr_player_count        = [2,3,4,5,6,7,8,9,10];
     $arr_map                 = [0,1,2,3];

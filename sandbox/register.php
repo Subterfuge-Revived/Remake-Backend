@@ -58,7 +58,6 @@
                 FROM sandbox.player_administrative_info
                 WHERE LOWER(player_administrative_info.mail) = LOWER(?)");
 
-
             // Add new player
             $db->bind_req($in_player_name, $in_password, $in_mail_addr)
                 ->exec_db("

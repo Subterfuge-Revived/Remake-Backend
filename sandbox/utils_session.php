@@ -104,19 +104,17 @@ WHERE session_id=? AND NOW() <= valid_until
 
     public function reworked_is_session_valid($session_id) {
 
+        $out_session_invalid = "[new_room] Invalid session. Authentication required";
+
         try {
 
             $this->db
                 ->bind_req($session_id)
                 ->bind_res($res_player_id)
+                ->error_num_row_zero($out_session_invalid)
                 ->exec_db("
                 SELECT player_id FROM sandbox.player_session
                 WHERE session_id=? AND NOW() <= valid_until");
-
-            if( $this->db->getNumRows() === 0 ) {
-
-                throw new \Exception($this->str_invalid_session);
-            }
 
             $this->player_id = $res_player_id;
 

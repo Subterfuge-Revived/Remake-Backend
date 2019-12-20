@@ -1,6 +1,6 @@
 <?php
 
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(0);
 require_once "credentials.php";
 
 class utils_database
@@ -109,10 +109,10 @@ class utils_database
 
         if( $this->error_if_num_row_zero && $this->num_rows == 0 ) {
 
-            throw new \Exception($this->error_if_num_row_zero_msg);
+            throw new Exception($this->error_if_num_row_zero_msg);
         } else if( $this->error_if_num_row_not_zero && $this->num_rows > 0 ) {
 
-            throw new \Exception($this->error_if_num_row_not_zero_msg);
+            throw new Exception($this->error_if_num_row_not_zero_msg);
         } else if( $this->num_rows > 1 ) {
 
             for($i = 0; $i < count($this->bind_res); $i++) {

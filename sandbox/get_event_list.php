@@ -1,69 +1,46 @@
 <?php
 
-    require("utils_security.php");
-    require("utils_database.php");
-    require("utils_json.php");
-    require("utils_session.php");
-
-    $sec = new utils_security();
-    $ses = new utils_session();
-    $json = new utils_json();
-
-    $session_id = $sec->rm_inject(($_POST["session_id"]));
-    $room_id = $sec->rm_inject($_POST["room_id"]);
+    /*
+     * Input
+     */
+    $in_session_id = $sec->rm_inject(($_POST["session_id"]));
+    $in_room_id = $sec->rm_inject($_POST["room_id"]);
 
     /*
     * Constants
     */
-    $str_invalid_session = "Invalid session. Authentication required";
-    $str_invalid_room = "Player not associated with room";
+    $out_invalid_room = "Player not associated with room";
 
+    // Begin
     try {
 
-        $con = utils_database::new_connection();
-        $session_check = $ses->session_valid($con, $session_id);
+        $db = new utils_database(utils_database::new_connection());
+        $func_ses = (new utils_session($db))->reworked_is_session_valid($in_session_id);
 
-        $player_id = $session_check["player_id"];
+        $func_player_id = $func_ses->getPlayerId();
 
-        $stmt = $con->prepare("
-    SELECT *
-    FROM sandbox.player_open_room
-    WHERE player_id=? AND room_id=?
-    ");
-        $stmt->bind_param("ii", $player_id, $room_id);
+        // Check if player is in Room
+        $db->bind_req($func_player_id, $in_room_id)
+            ->error_num_row_zero($out_invalid_room)
+            ->exec_db("
+            SELECT *
+            FROM sandbox.player_open_room
+            WHERE player_id=? AND room_id=?");
 
-        if (!$stmt->execute()) {
-            throw new \Exception($stmt->error);
-        }
+        // Check if Room is ongoing
+        $db->bind_req($in_room_id)
+            ->error_num_row_zero($out_invalid_room)
+            ->exec_db("
+            SELECT *
+            FROM sandbox.ongoing_rooms
+            WHERE id=?");
 
-        $stmt->store_result();
-        if (!$stmt->num_rows) {
-            throw new \Exception($str_invalid_room);
-        }
+        $db = new utils_database(utils_database::new_connection_events());
 
-        $stmt = $con->prepare("
-    SELECT *
-    FROM sandbox.ongoing_rooms
-    WHERE id=?
-    ");
-        $stmt->bind_param("i", $room_id);
-
-        if (!$stmt->execute()) {
-            throw new \Exception($stmt->error);
-        }
-
-        $stmt->store_result();
-        if (!$stmt->num_rows) {
-            throw new \Exception($str_invalid_room);
-        }
-
-        $con->close();
-        $con = utils_database::new_connection_events();
-
-        $event_room = "events_room_" . $room_id;
+        $func_event_room = "events_room_" . $in_room_id;
 
         $stmt = $con->prepare("
-SELECT * FROM events_ongoing_rooms." . $event_room . "
+SELECT * FROM events_ongoing_rooms." . $func_event_room . "
 ");
 
         if(!$stmt->execute()) {

@@ -1,124 +1,69 @@
 <?php
 
-    require("utils_security.php");
-    require("utils_database.php");
-    require("utils_json.php");
-    require("utils_session.php");
-
-    $sec = new utils_security();
-    $ses = new utils_session();
-    $json = new utils_json();
-
-    $session_id = $sec->rm_inject(($_POST["session_id"]));
-    $room_id = $sec->rm_inject($_POST["room_id"]);
+    /*
+     * Input
+     */
+    $in_session_id  = $sec->rm_inject(($_POST["session_id"]));
+    $in_room_id     = $sec->rm_inject($_POST["room_id"]);
 
     /*
     * Constants
     */
-    $str_invalid_session = "Invalid session. Authentication required";
-    $str_invalid_room = "No room found with id: " . $room_id;
-    $str_invalid_assignment = "Player not in room: " . $room_id;
+    $out_invalid_room       = "[leave_room] No room found with id: " . $in_room_id;
+    $out_invalid_assignment = "[leave_room] Player not in room: " . $in_room_id;
 
+    // Begin
     try {
 
-        $con = utils_database::new_connection();
-        $session_check = $ses->session_valid($con, $session_id);
+        $db = new utils_database(utils_database::new_connection());
+        $func_ses = (new utils_session($db))->reworked_is_session_valid($in_session_id);
 
-        $player_id = $session_check["player_id"];
+        $func_player_id = $func_ses->getPlayerId();
 
-        if(!$session_check["valid"]) {
-            throw new \Exception($str_invalid_session);
-        }
+        // Get the Room player count
+        $db->bind_req($in_room_id)
+            ->bind_res($res_player_count)
+            ->error_num_row_zero($out_invalid_room)
+            ->exec_db("
+            SELECT player_count
+            FROM sandbox.open_rooms
+            WHERE id=?");
 
-        $stmt = $con->prepare("
-SELECT player_count
-FROM sandbox.open_rooms
-WHERE id=?
-");
-        $stmt->bind_param("i", $room_id);
+        // Check if player is in Room
+        $db->bind_req($func_player_id, $in_room_id)
+            ->error_num_row_zero($out_invalid_assignment)
+            ->exec_db("
+            SELECT *
+            FROM sandbox.player_open_room
+            WHERE player_id=? AND room_id=?");
 
-        if(!$stmt->execute()) {
-            throw new \Exception($stmt->error);
-        }
+        // Remove player from Room
+        $db->bind_req($func_player_id, $in_room_id)
+            ->exec_db("
+            DELETE FROM sandbox.player_open_room
+            WHERE player_id=? AND room_id=?");
 
-        $stmt->store_result();
-
-        if(!$stmt->num_rows) {
-            throw new \Exception($str_invalid_room);
-        }
-
-        $stmt->bind_result($res_player_count);
-
-        if(!$stmt->fetch()) {
-            throw new \Exception($stmt->error);
-        }
-
-        echo $res_player_count;
-
-        $stmt = $con->prepare("
-SELECT *
-FROM sandbox.player_open_room
-WHERE player_id=? AND room_id=?
-");
-        $stmt->bind_param("ii", $player_id, $room_id);
-
-        if(!$stmt->execute()) {
-            throw new \Exception($stmt->error);
-        }
-
-        $stmt->store_result();
-        if(!$stmt->num_rows) {
-            throw new \Exception($str_invalid_assignment);
-        }
-
-        $stmt = $con->prepare("
-DELETE FROM sandbox.player_open_room
-WHERE player_id=? AND room_id=?
-");
-        $stmt->bind_param("ii", $player_id, $room_id);
-
-        if(!$stmt->execute()) {
-            throw new \Exception($stmt->error);
-        }
-
-
+        // If the room is now empty, remove it else update player count
         if($res_player_count === 1) {
 
-            $stmt = $con->prepare("
-DELETE FROM sandbox.open_rooms
-WHERE sandbox.open_rooms.id = ?
-");
-
-            $stmt->bind_param("i", $room_id);
-
-            if(!$stmt->execute()) {
-                throw new \Exception($stmt->error);
-            }
+            $db->bind_req($in_room_id)
+                ->exec_db("
+                DELETE FROM sandbox.open_rooms
+                WHERE id=?");
 
         } else {
 
-            $stmt = $con->prepare("
-UPDATE sandbox.open_rooms 
-SET player_count = player_count - 1
-WHERE id = ?
-");
-            $stmt->bind_param("i", $room_id);
+            $db->bind_req($in_room_id)
+                ->exec_db("
+                UPDATE sandbox.open_rooms
+                SET player_count = player_count - 1
+                WHERE id=?");
 
-            if(!$stmt->execute()) {
-                throw new \Exception($stmt->error);
-            }
-
-            $stmt->store_result();
         }
 
-
-        $json->success_join_room($room_id);
+        $json->success_join_room($in_room_id);
 
     } catch (\Exception $e) {
 
         $json->fail_msg($e->getMessage());
-    } finally {
-
-        $stmt->close();
-        $con->close();
     }

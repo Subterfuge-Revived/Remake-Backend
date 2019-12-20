@@ -9,7 +9,6 @@
     /*
      * Constants
      */
-    $out_invalid_session     = "[join_room] Invalid session. Authentication required";
     $out_insufficient_rating = "[join_room] Insufficient rating";
     $out_invalid_room        = "[join_room] No room found with id: " . $in_room_id;
     $out_already_joined      = "[join_room] You have already joined this room";

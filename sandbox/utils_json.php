@@ -65,6 +65,17 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
+    public function success_start_early($room_id) {
+
+        $arr = array(
+            'success' => true,
+            'room' => $room_id
+        );
+
+        echo json_encode($arr);
+        http_response_code(httpStatusCode::OK);
+    }
+
     public function  success_retr_rooms($arr) {
 
         echo json_encode($arr);
