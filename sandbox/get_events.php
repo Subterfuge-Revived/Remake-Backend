@@ -39,31 +39,13 @@
 
         $func_event_room = "events_room_" . $in_room_id;
 
-        $stmt = $con->prepare("
-SELECT * FROM events_ongoing_rooms." . $func_event_room . "
-");
+        $db->bind_res($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg)
+            ->exec_db("
+            SELECT *
+            FROM events_ongoing_rooms." . $func_event_room . "
+            ");
 
-        if(!$stmt->execute()) {
-            throw new \Exception($stmt->error);
-        }
-
-        $stmt->store_result();
-        $stmt->bind_result($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg);
-
-        $events = array();
-
-        while($stmt->fetch()) {
-
-            $events[count($events)] = array(
-                "event_id" => $res_event_id,
-                "time_issued" => $res_time_issued,
-                "occurs_at" => $res_occurs_at,
-                "player_id" => $res_player_id,
-                "event_msg" => $res_event_msg
-            );
-        }
-
-        $json->success_retr_rooms($events);
+        $json->success_get_events($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg);
 
     } catch (\Exception $e) {
         $json->fail_msg($e->getMessage());

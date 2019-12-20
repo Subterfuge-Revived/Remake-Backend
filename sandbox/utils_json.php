@@ -81,4 +81,24 @@ class utils_json
         echo json_encode($arr);
         http_response_code(httpStatusCode::OK);
     }
+
+    public function success_get_events($res_event_id, $res_time_issued, $res_occurs_at,
+                                       $res_player_id, $res_event_msg) {
+
+        $arr = array();
+
+        foreach( $res_event_id as $i => $el ) {
+
+            $arr[$i] = array(
+                "event_id" => $res_event_id[$i],
+                "time_issued" => $res_time_issued[$i],
+                "occurs_at" => $res_occurs_at[$i],
+                "player_id" => $res_player_id[$i],
+                "event_msg" => $res_event_msg[$i]
+            );
+        }
+
+        echo json_encode($arr);
+        http_response_code(httpStatusCode::OK);
+    }
 }

@@ -31,6 +31,7 @@
     $event_leave_room       = "leave_room";
     $event_start_early      = "start_early";
     $event_submit_event     = "submit_event";
+    $event_get_events       = "get_events";
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
@@ -59,6 +60,10 @@
     } else if( strcmp($event_type, $event_submit_event) == 0 ) {
 
         require_once 'submit_event.php';
+
+    } else if( strcmp($event_type, $event_get_events) == 0 ) {
+
+        require_once 'get_events.php';
 
     }
 
