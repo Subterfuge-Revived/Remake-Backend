@@ -1,20 +1,10 @@
 <?php
 
-    require("utils_security.php");
-    require("utils_database.php");
-    require("utils_json.php");
-    require("utils_session.php");
-
-    $sec = new utils_security();
-    $ses = new utils_session();
-    $json = new utils_json();
-
     $session_id = $sec->rm_inject(($_POST["session_id"]));
 
     /*
     * Constants
     */
-    $str_invalid_session = "Invalid session. Authentication required";
     $str_insufficient_rating = "Insufficient rating";
 
     try {

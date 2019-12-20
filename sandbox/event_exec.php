@@ -32,6 +32,7 @@
     $event_start_early      = "start_early";
     $event_submit_event     = "submit_event";
     $event_get_events       = "get_events";
+    $event_get_open_rooms   = "get_open_rooms";
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
@@ -64,6 +65,10 @@
     } else if( strcmp($event_type, $event_get_events) == 0 ) {
 
         require_once 'get_events.php';
+
+    } else if( strcmp($event_type, $event_get_open_rooms) == 0 ) {
+
+        require_once 'get_open_rooms.php';
 
     }
 

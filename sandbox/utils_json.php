@@ -76,7 +76,7 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
-    public function  success_retr_rooms($arr) {
+    public function success_retr_rooms($arr) {
 
         echo json_encode($arr);
         http_response_code(httpStatusCode::OK);
@@ -95,6 +95,33 @@ class utils_json
                 "occurs_at" => $res_occurs_at[$i],
                 "player_id" => $res_player_id[$i],
                 "event_msg" => $res_event_msg[$i]
+            );
+        }
+
+        echo json_encode($arr);
+        http_response_code(httpStatusCode::OK);
+    }
+
+    public function success_get_open_rooms($res_creator_id, $res_rated, $res_max_players,
+                                           $res_player_count, $res_min_rating, $res_description, $res_goal, $res_anonymity,
+                                           $res_map, $res_seed, $func_players) {
+
+        $arr = array();
+
+        foreach( (array)$res_creator_id as $i => $el ) {
+
+            $arr[$i] = array(
+                "creator_id" => ((array)$res_creator_id)[$i],
+                "rated" => ((array)$res_rated)[$i] == 1 ? true : false,
+                "max_players" => ((array)$res_max_players)[$i],
+                "player_count" => ((array)$res_player_count)[$i],
+                "min_rating" => ((array)$res_min_rating)[$i],
+                "description" => ((array)$res_description)[$i],
+                "goal" => ((array)$res_goal)[$i],
+                "anonymity" => ((array)$res_anonymity)[$i] == 1 ? true : false,
+                "map" => ((array)$res_map)[$i],
+                "seed" => ((array)$res_seed)[$i],
+                "players" => $func_players[$i]
             );
         }
 
