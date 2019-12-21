@@ -32,7 +32,7 @@
     $event_start_early      = "start_early";
     $event_submit_event     = "submit_event";
     $event_get_events       = "get_events";
-    $event_get_open_rooms   = "get_open_rooms";
+    $event_get_room_data    = "get_room_data";
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
@@ -66,9 +66,9 @@
 
         require_once 'get_events.php';
 
-    } else if( strcmp($event_type, $event_get_open_rooms) == 0 ) {
+    } else if( strcmp($event_type, $event_get_room_data) == 0 ) {
 
-        require_once 'get_open_rooms.php';
+        require_once 'get_room_data.php';
 
     }
 

@@ -4,6 +4,7 @@
      * Input
      */
     $in_session_id          = $sec->rm_inject(($_POST["session_id"]));
+    $in_room_status         = $sec->rm_inject(($_POST["room_status"])) === 'ongoing' ? 1 : 0;
     $in_filter_by_player    = $sec->rm_inject(($_POST["filter_by_player"])) === 'true' ? 1 : 0;
 
     // Begin
@@ -24,6 +25,13 @@
                 "SELECT room_id, creator_id, rated, max_players, player_count, min_rating, description, goal, anonymity, map, seed
                  FROM sandbox.player_open_room
                  INNER JOIN sandbox.open_rooms o ON player_open_room.room_id = o.id AND player_open_room.player_id=?";
+        }
+        if( $in_room_status === 1 ) {
+
+            $func_temp_stmt =
+                "SELECT room_id, creator_id, rated, player_count, min_rating, description, goal, anonymity, map, seed
+                 FROM sandbox.player_open_room
+                 INNER JOIN sandbox.ongoing_rooms o on player_open_room.room_id = o.id AND player_open_room.player_id=?";
         }
 
         // Get Room Data (either player specific or all)
@@ -67,9 +75,9 @@
 
         $json->success_get_open_rooms($res_creator_id, $res_rated, $res_max_players,
             $res_player_count, $res_min_rating, $res_description, $res_goal, $res_anonymity,
-            $res_map, $res_seed, $func_players);
+            $res_map, $res_seed, $func_players, $in_room_status);
 
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
 
         $json->fail_msg($e->getMessage());
     }
