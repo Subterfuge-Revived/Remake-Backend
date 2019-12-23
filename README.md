@@ -1,5 +1,7 @@
 # Subterfuge Backend
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/832fc79f1e130e713524)
+
 ### Setup Instructions
 Step 1: Go to https://www.apachefriends.org/download.html
 Step 2: Download the latest release and install it
