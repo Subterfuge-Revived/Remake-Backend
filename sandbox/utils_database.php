@@ -1,6 +1,5 @@
 <?php
 
-error_reporting(0);
 require_once "credentials.php";
 
 class utils_database
