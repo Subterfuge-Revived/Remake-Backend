@@ -59,9 +59,13 @@
                 constraint " . $func_event_table_pk . "
                     primary key (event_id)
             );");
+
+            $json->success_start_early($in_room_id);
+
+        } else {
+          $json->failure_start_early($in_room_id, "players must be > 1");
         }
 
-        $json->success_start_early($in_room_id);
 
     } catch (\Exception $e) {
 
