@@ -41,6 +41,18 @@ CREATE TABLE `ongoing_rooms` (
 -- Dumping data for table `ongoing_rooms`
 --
 
+CREATE TABLE `messages` (
+  `room_id` int(11) NOT NULL AUTO_INCREMENT,
+  `time_issued` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `recipient_id` int(11) NOT NULL,
+  `message` varchar(250) NOT NULL,
+  PRIMARY KEY (`room_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COMMENT='All messages';
+
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
 LOCK TABLES `ongoing_rooms` WRITE;
 /*!40000 ALTER TABLE `ongoing_rooms` DISABLE KEYS */;
 INSERT INTO `ongoing_rooms` VALUES (1,1,1,2,880,'Backend Testing',1,0,1,1571079360),(2,1,1,2,1190,'New Room 2',1,0,1,1571134878),(3,4,1,2,1195,'Room',1,0,2,1571135043),(4,1,1,2,1200,'New Room 4',1,0,2,1571135171),(5,4,1,2,800,'Test Room 1',1,0,2,1571154097),(6,1,0,2,0,'fff',1,0,1,1571154337),(7,1,0,2,0,'fff2',1,0,1,1571154428),(8,1,0,2,0,'fff22',1,0,1,1571154455),(9,1,0,2,0,'fff22',1,0,1,1571154780),(10,1,0,2,0,'fff22',1,0,1,1571155163),(11,1,0,2,0,'fff22',1,0,1,1571155331),(12,1,0,2,0,'fff22',1,0,1,1571155373),(13,1,0,2,0,'fff22',1,0,1,1571156330),(14,1,0,2,0,'fff22',1,0,1,1571156613);
