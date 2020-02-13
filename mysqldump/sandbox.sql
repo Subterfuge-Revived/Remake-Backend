@@ -41,6 +41,8 @@ CREATE TABLE `ongoing_rooms` (
 -- Dumping data for table `ongoing_rooms`
 --
 
+DROP TABLE IF EXISTS `messages`;
+
 CREATE TABLE `messages` (
   `room_id` int(11) NOT NULL AUTO_INCREMENT,
   `time_issued` int(11) NOT NULL,
