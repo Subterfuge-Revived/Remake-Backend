@@ -34,6 +34,7 @@
     $event_get_events       = "get_events";
     $event_get_room_data    = "get_room_data";
     $event_message          = "message";
+    $event_get_message      = "get_message";
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
@@ -74,5 +75,9 @@
     } else if( strcmp($event_type, $event_message) == 0 ) {
 
         require_once 'message.php';
+
+    } else if( strcmp($event_type, $event_get_message) == 0 ) {
+
+        require_once 'get_message.php';
 
     }

@@ -65,6 +65,7 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
+
     public function success_start_early($room_id) {
 
         $arr = array(
@@ -121,6 +122,27 @@ class utils_json
                 "player_id" => $res_player_id[$i],
                 "event_msg" => $res_event_msg[$i]
             );
+        }
+
+        echo json_encode($arr);
+        http_response_code(httpStatusCode::OK);
+    }
+
+    public function success_get_messages($res_room_id, $res_time_issued, $res_sender_id, $res_recipient_id, $res_message, $in_timestamp) {
+
+        $arr = array();
+
+        foreach( $res_time_issued as $i => $el ) {
+          if($res_time_issued[$i] >= $in_timestamp){
+
+              $arr[$i] = array(
+                  "room_id" => $res_room_id[$i],
+                  "time_issued" => $res_time_issued[$i],
+                  "sender_id" => $res_sender_id[$i],
+                  "recipient_id" => $res_recipient_id[$i],
+                  "message" => $res_message[$i]
+              );
+          }
         }
 
         echo json_encode($arr);
