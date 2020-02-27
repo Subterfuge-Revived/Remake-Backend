@@ -52,6 +52,16 @@ CREATE TABLE `messages` (
   PRIMARY KEY (`room_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COMMENT='All messages';
 
+DROP TABLE IF EXISTS `blocks`;
+
+CREATE TABLE `blocks` (
+  `room_id` int(11) NOT NULL AUTO_INCREMENT,
+  `time_issued` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `recipient_id` int(11) NOT NULL,
+  PRIMARY KEY (`room_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COMMENT='Everyone who is blocking everyone';
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 

@@ -90,6 +90,33 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
+    public function success_block($room_id, $other_player_id) {
+
+        $arr = array(
+            'success' => true,
+            'room_id' => $room_id,
+            'other_player_id' => $other_player_id
+        );
+
+        echo json_encode($arr);
+        http_response_code(httpStatusCode::OK);
+    }
+
+    public function success_unblock($room_id, $other_player_id) {
+
+        $arr = array(
+            'success' => true,
+            'room_id' => $room_id,
+            'other_player_id' => $other_player_id
+        );
+
+        echo json_encode($arr);
+        http_response_code(httpStatusCode::OK);
+    }
+
+
+
+
     public function failure_start_early($room_id, $reason) {
 
         $arr = array(

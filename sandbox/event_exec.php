@@ -35,6 +35,9 @@
     $event_get_room_data    = "get_room_data";
     $event_message          = "message";
     $event_get_message      = "get_message";
+    $event_block            = "block";
+    $event_unblock          = "unblock";
+
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
@@ -80,4 +83,11 @@
 
         require_once 'get_message.php';
 
+    } else if( strcmp($event_type, $event_block) == 0 ) {
+
+        require_once 'block.php';
+
+    } else if ( strcmp($event_type, $event_unblock) == 0 ) {
+
+        require_once 'unblock.php';
     }
