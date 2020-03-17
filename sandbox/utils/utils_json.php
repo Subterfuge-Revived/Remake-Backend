@@ -1,6 +1,6 @@
 <?php
 
-require_once ("httpStatusCode.php");
+require_once("httpStatusCode.php");
 
 class utils_json
 {

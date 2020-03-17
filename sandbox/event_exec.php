@@ -5,10 +5,10 @@
      */
     require __DIR__ . '/vendor/autoload.php';
 
-    require "utils_security.php";
-    require "utils_database.php";
-    require "utils_session.php";
-    require "utils_json.php";
+    require "utils/utils_security.php";
+    require "utils/utils_database.php";
+    require "utils/utils_session.php";
+    require "utils/utils_json.php";
 
     use mofodojodino\ProfanityFilter\Check;
 
@@ -41,53 +41,53 @@
 
     if( strcmp($event_type, $event_login) == 0 ) {
 
-        require_once 'login.php';
+        require_once 'auth/login.php';
 
     } else if( strcmp($event_type, $event_register) == 0 ) {
 
-        require_once 'register.php';
+        require_once 'auth/register.php';
 
     } else if( strcmp($event_type, $event_create_new_room) == 0 ) {
 
-        require_once 'new_room.php';
+        require_once 'room/new_room.php';
 
     } else if( strcmp($event_type, $event_join_room) == 0 ) {
 
-        require_once 'join_room.php';
+        require_once 'room/join_room.php';
 
     } else if( strcmp($event_type, $event_leave_room) == 0 ) {
 
-        require_once 'leave_room.php';
+        require_once 'room/leave_room.php';
 
     } else if( strcmp($event_type, $event_start_early) == 0 ) {
 
-        require_once 'start_early.php';
+        require_once 'room/start_early.php';
 
     } else if( strcmp($event_type, $event_submit_event) == 0 ) {
 
-        require_once 'submit_event.php';
+        require_once 'data/submit_event.php';
 
     } else if( strcmp($event_type, $event_get_events) == 0 ) {
 
-        require_once 'get_events.php';
+        require_once 'data/get_events.php';
 
     } else if( strcmp($event_type, $event_get_room_data) == 0 ) {
 
-        require_once 'get_room_data.php';
+        require_once 'data/get_room_data.php';
 
     } else if( strcmp($event_type, $event_message) == 0 ) {
 
-        require_once 'message.php';
+        require_once 'messaging/message.php';
 
     } else if( strcmp($event_type, $event_get_message) == 0 ) {
 
-        require_once 'get_message.php';
+        require_once 'messaging/get_message.php';
 
     } else if( strcmp($event_type, $event_block) == 0 ) {
 
-        require_once 'block.php';
+        require_once 'messaging/block.php';
 
     } else if ( strcmp($event_type, $event_unblock) == 0 ) {
 
-        require_once 'unblock.php';
+        require_once 'messaging/unblock.php';
     }

@@ -9,7 +9,7 @@
     /*
     * Constants
     */
-    $out_invalid_request        = "[start_early] Invalid request: " . $in_room_id;
+    $out_invalid_request = "[start_early] Invalid request: " . $in_room_id;
 
     try {
 
