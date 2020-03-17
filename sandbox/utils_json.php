@@ -176,7 +176,7 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
-    public function success_get_open_rooms($res_creator_id, $res_rated, $res_max_players,
+    public function success_get_open_rooms($res_room_id, $res_creator_id, $res_rated, $res_max_players,
                                            $res_min_rating, $res_description, $res_goal, $res_anonymity,
                                            $res_map, $res_seed, $func_players, $in_room_status) {
 
@@ -185,6 +185,7 @@ class utils_json
         foreach( (array)$res_creator_id as $i => $el ) {
 
             $arr[$i] = array(
+                "room_id" => ((array)$res_room_id)[$i],
                 "creator_id" => ((array)$res_creator_id)[$i],
                 "rated" => ((array)$res_rated)[$i] == 1 ? true : false,
                 "min_rating" => ((array)$res_min_rating)[$i],

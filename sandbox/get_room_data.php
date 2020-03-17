@@ -79,7 +79,7 @@
             }
         }
 
-        $json->success_get_open_rooms($res_creator_id, $res_rated, $res_max_players,
+        $json->success_get_open_rooms($res_room_id, $res_creator_id, $res_rated, $res_max_players,
             $res_min_rating, $res_description, $res_goal, $res_anonymity,
             $res_map, $res_seed, $func_players, $in_room_status);
 
