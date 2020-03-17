@@ -27,8 +27,9 @@
     try {
 
         if( !in_array($in_max_players, $arr_player_count)
-            || !in_array($in_map, $arr_map)
-            || !in_array($in_goal, $arr_goal)
+            || !is_numeric($in_goal) || !is_numeric($in_map)
+            || !is_numeric($in_max_players) || !is_numeric($in_min_rating)
+            || !in_array($in_map, $arr_map) || !in_array($in_goal, $arr_goal)
             || !($in_min_rating >= 0) ) {
 
             throw new \Exception($out_invalid_input);
@@ -79,7 +80,7 @@
                 INSERT INTO sandbox.player_open_room (player_id, room_id)
                 VALUES(?,?)");
 
-            $json->success_new_room($func_player_id, $in_rated, $in_max_players, $int_init_player_count,
+            $json->success_new_room($func_insert_id, $func_player_id, $in_rated, $in_max_players, $int_init_player_count,
                 $in_min_rating, $in_description, $in_goal, $in_anonymity, $in_map, $func_time);
         }
     } catch (\Exception $e) {

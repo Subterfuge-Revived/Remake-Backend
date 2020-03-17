@@ -31,12 +31,13 @@ class utils_json
         http_response_code(httpStatusCode::BAD_REQUEST);
     }
 
-    public function success_new_room($player_id, $rated, $max_players, $int_initial_player_count,
+    public function success_new_room($room_id, $player_id, $rated, $max_players, $int_initial_player_count,
                                      $min_rating, $description, $goal, $anonymity, $map, $time) {
 
         $arr = array(
             'success' => true,
             'created_room' => array(
+                'room_id' => $room_id,
                 'creator' => $player_id,
                 'description' => $description,
                 'rated' => $rated == 1 ? true:false,
