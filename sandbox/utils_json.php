@@ -177,7 +177,7 @@ class utils_json
     }
 
     public function success_get_open_rooms($res_creator_id, $res_rated, $res_max_players,
-                                           $res_player_count, $res_min_rating, $res_description, $res_goal, $res_anonymity,
+                                           $res_min_rating, $res_description, $res_goal, $res_anonymity,
                                            $res_map, $res_seed, $func_players, $in_room_status) {
 
         $arr = array();
@@ -187,7 +187,6 @@ class utils_json
             $arr[$i] = array(
                 "creator_id" => ((array)$res_creator_id)[$i],
                 "rated" => ((array)$res_rated)[$i] == 1 ? true : false,
-                "player_count" => ((array)$res_player_count)[$i],
                 "min_rating" => ((array)$res_min_rating)[$i],
                 "description" => ((array)$res_description)[$i],
                 "goal" => ((array)$res_goal)[$i],
@@ -196,7 +195,7 @@ class utils_json
                 "seed" => ((array)$res_seed)[$i],
                 "players" => $func_players[$i]
             );
-            if( $in_room_status === 1 ) {
+            if( $in_room_status === 0 ) {
                 $arr[$i]["max_players"] = ((array)$res_max_players)[$i];
             }
         }

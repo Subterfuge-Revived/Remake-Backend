@@ -35,11 +35,17 @@
         }
 
         // Get Room Data (either player specific or all)
-        $db->bind_req($func_player_id)
-            ->bind_res($res_room_id, $res_creator_id, $res_rated, $res_max_players,
+        $db->bind_req($func_player_id);
+        if( $in_room_status === 1 )
+            $db->bind_res($res_room_id, $res_creator_id, $res_rated,
+                $res_max_players, $res_min_rating, $res_description, $res_goal, $res_anonymity,
+                $res_map, $res_seed);
+        else
+            $db->bind_res($res_room_id, $res_creator_id, $res_rated, $res_max_players,
                 $res_player_count, $res_min_rating, $res_description, $res_goal, $res_anonymity,
-                $res_map, $res_seed)
-            ->exec_db($func_temp_stmt);
+                $res_map, $res_seed);
+
+        $db->exec_db($func_temp_stmt);
 
         $func_players = array();
 
@@ -74,7 +80,7 @@
         }
 
         $json->success_get_open_rooms($res_creator_id, $res_rated, $res_max_players,
-            $res_player_count, $res_min_rating, $res_description, $res_goal, $res_anonymity,
+            $res_min_rating, $res_description, $res_goal, $res_anonymity,
             $res_map, $res_seed, $func_players, $in_room_status);
 
     } catch (Exception $e) {
