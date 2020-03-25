@@ -9,7 +9,6 @@ class utils_session
     /*
     * Constants
     */
-    private $str_invalid_session = "Invalid session. Authentication required";
 
     public function __construct(utils_database $db) {
 
@@ -28,7 +27,7 @@ class utils_session
     {
 
         try {
-//test
+
             $stmt = $con->prepare("
 INSERT INTO sandbox.player_session (player_id, session_id, valid_until) 
 VALUES (?,?,DATE_ADD(NOW(), INTERVAL 30 MINUTE )) 
