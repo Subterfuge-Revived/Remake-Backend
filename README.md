@@ -7,6 +7,7 @@
 [![issues-closed-raw](https://img.shields.io/github/issues-closed/Subterfuge-Revived/Remake-Backend)](https://github.com/Subterfuge-Revived/Remake-Backend/issues?q=is%3Aclosed+)
 [![Banner](banner.png)]()
 
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/832fc79f1e130e713524)
 ### Quick note:
 
 This is an unfinished preview, if you find that something is missing let us know.
