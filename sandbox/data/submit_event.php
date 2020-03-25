@@ -45,10 +45,10 @@
             FROM sandbox.events
             WHERE room_id=?");
 
-        $func_max_event_id = 0;
+        $func_max_event_id++;
 
         // Insert new command
-        $db->bind_req($in_room_id, $func_max_event_id, time(), time(), $func_player_id, $in_event_msg)
+        $db->bind_req($in_room_id, $func_max_event_id, time(), $in_occurs_at, $func_player_id, $in_event_msg)
             ->exec_db("
             INSERT INTO sandbox.events (room_id, event_id, time_issued, occurs_at, player_id, event_msg)
             VALUES (?,?,?,?,?,?)");
