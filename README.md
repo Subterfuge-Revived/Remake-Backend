@@ -6,3 +6,7 @@
 [![issues](https://img.shields.io/github/issues/Subterfuge-Revived/Remake-Backend)](https://github.com/Subterfuge-Revived/Remake-Backend/issues?q=is%3Aopen)
 [![issues-closed-raw](https://img.shields.io/github/issues-closed/Subterfuge-Revived/Remake-Backend)](https://github.com/Subterfuge-Revived/Remake-Backend/issues?q=is%3Aclosed+)
 [![Banner](banner.png)]()
+
+### Quick note:
+
+This is an unfinished preview, if you find that something is missing let us know.
