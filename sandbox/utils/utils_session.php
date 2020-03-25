@@ -28,7 +28,7 @@ class utils_session
     {
 
         try {
-
+//test
             $stmt = $con->prepare("
 INSERT INTO sandbox.player_session (player_id, session_id, valid_until) 
 VALUES (?,?,DATE_ADD(NOW(), INTERVAL 30 MINUTE )) 
