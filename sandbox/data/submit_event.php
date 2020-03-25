@@ -14,7 +14,8 @@
     $out_invalid_room = "Player not associated with room";
 
     // Begin
-    try {
+    try{
+
 
         $db = new utils_database(utils_database::new_connection());
         $func_ses = (new utils_session($db))->reworked_is_session_valid($in_session_id);
@@ -37,14 +38,20 @@
             FROM sandbox.ongoing_rooms
             WHERE id=?");
 
-        $func_event_room = "events_room_" . $in_room_id;
+        $db->bind_req($in_room_id)
+            ->bind_res($func_max_event_id)
+            ->exec_db("
+            SELECT COALESCE(MAX(event_id), -1)
+            FROM sandbox.events
+            WHERE room_id=?");
+
+        $func_max_event_id = 0;
 
         // Insert new command
-        $db = new utils_database(utils_database::new_connection_events());
-        $db->bind_req(time(), $in_occurs_at, $func_player_id, $in_event_msg)
+        $db->bind_req($in_room_id, $func_max_event_id, time(), time(), $func_player_id, $in_event_msg)
             ->exec_db("
-            INSERT INTO events_ongoing_rooms." . $func_event_room . " (time_issued, occurs_at, player_id, event_msg)
-            VALUES (?,?,?,?)");
+            INSERT INTO sandbox.events (room_id, event_id, time_issued, occurs_at, player_id, event_msg)
+            VALUES (?,?,?,?,?,?)");
 
         $json->success_join_room($in_room_id);
 

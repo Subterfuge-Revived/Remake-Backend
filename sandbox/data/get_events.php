@@ -35,15 +35,12 @@
             FROM sandbox.ongoing_rooms
             WHERE id=?");
 
-        $db = new utils_database(utils_database::new_connection_events());
-
-        $func_event_room = "events_room_" . $in_room_id;
-
-        $db->bind_res($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg)
+        $db->bind_req($in_room_id)
+            ->bind_res($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg)
             ->exec_db("
-            SELECT *
-            FROM events_ongoing_rooms." . $func_event_room . "
-            ");
+            SELECT event_id, time_issued, occurs_at, player_id, event_msg
+            FROM sandbox.events
+            WHERE room_id=?");
 
         $json->success_get_events($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg);
 

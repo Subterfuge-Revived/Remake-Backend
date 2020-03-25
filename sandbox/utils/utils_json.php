@@ -59,7 +59,7 @@ class utils_json
 
         $arr = array(
             'success' => true,
-            'room' => $room_id
+            'room' => (int)$room_id
         );
 
         echo json_encode($arr);

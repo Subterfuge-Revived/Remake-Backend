@@ -1,6 +1,5 @@
 <?php
 
-require_once "credentials.php";
 
 class utils_database
 {

@@ -1,4 +1,6 @@
 <?php
+    error_reporting(0);
+
 
     /*
      * Global Event Requirements
@@ -9,6 +11,7 @@
     require "utils/utils_database.php";
     require "utils/utils_session.php";
     require "utils/utils_json.php";
+    require "credentials.php";
 
     use mofodojodino\ProfanityFilter\Check;
 
