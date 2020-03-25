@@ -7,7 +7,7 @@ class utils_session
     private $player_id;
 
     /*
-    * Constants
+    * Constants.
     */
 
     public function __construct(utils_database $db) {
