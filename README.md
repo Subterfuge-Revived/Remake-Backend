@@ -19,7 +19,7 @@ Provides necessary components in order to enable multi-player functionality thro
 
 ## Usage
 
-We provide a Postman API package which you can get by pressing on the `Run in Postman` button at the top of this 
+We provide a Postman API package which you can get by pressing the `Run in Postman` button at the top of this 
 document. Once imported various requests can be tested. 
  - Select a request, navigate to `Body > form-data` and fill-in all empty values
  - Press `Send` - The response shows up at the bottom. For improved readability Switch from `HTML` to `JSON` next
