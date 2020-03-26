@@ -108,7 +108,7 @@ document. Once imported various requests can be tested.
            }
         }
         ```
-> Index {2} - Password from step 2.
+        > Index {2} - Password from step 2.
 
 ## Windows Setup
 
