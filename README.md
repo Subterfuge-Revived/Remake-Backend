@@ -22,12 +22,12 @@ Provides necessary components in order to enable multi-player functionality thro
 We provide a Postman API package which you can get by pressing the `Run in Postman` button at the top of this 
 document. Once imported various requests can be tested. 
  - Select a request, navigate to `Body > form-data` and fill-in all empty values
- - Press `Send` - The response shows up at the bottom. For improved readability Switch from `HTML` to `JSON` next
+ - Press `Send` - The response shows up at the bottom. For improved readability switch from `HTML` to `JSON` next
  to the `Pretty | Raw | Preview | Visualize` menu
  
  - Note: If you the request returns a `404` code it might be that you have to change the link. It is generally the path 
  to the `event_exec.php` which might be different on your system.
- As a exmple:
+ As an example:
     - Switching from `http://localhost/sandbox/event_exec.php` to `http://localhost/subterfuge/sandbox/event_exec.php`
     solves the issue in most cases
 
