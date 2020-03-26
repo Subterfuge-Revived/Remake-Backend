@@ -27,7 +27,7 @@ CREATE DATABASE events_ongoing_rooms;
 Step 7: Import the .sql presets
 ```
 mysql -u [Username] -p sandbox < [pathTo:sandbox.sql]
-mysql -u [Username] -p sandbox < [pathTo:events_ongoing_rooms.sql]
+mysql -u [Username] -p sandbox < [pathTo:vents_ongoing_rooms.sql]
 ```
 Step 8: Go to https://getcomposer.org/download/
 Step 9: Download and install composer
