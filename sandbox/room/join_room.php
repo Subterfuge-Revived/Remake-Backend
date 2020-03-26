@@ -69,13 +69,16 @@
         // Check if room is now full after join
         if( ++$res_player_count == $res_max_players ) {
 
+            $func_time = time();
+
             // Transfer open room to ongoing rooms
-            $db->bind_req($res_room_id)
+            $db->bind_req($func_time, $res_room_id)
                 ->exec_db("
-                INSERT INTO sandbox.ongoing_rooms
-                SELECT id, creator_id, rated, player_count + 1, min_rating, description, goal, anonymity, map, seed
-                FROM sandbox.open_rooms
-                WHERE id = ?");
+                INSERT INTO sandbox.ongoing_rooms (started_at, id, creator_id, rated, player_count, min_rating, description, goal, anonymity, map, seed) 
+                    SELECT ?, id, creator_id, rated, player_count + 1, min_rating, description, goal, anonymity, map, seed
+                    FROM sandbox.open_rooms
+                    WHERE id = ?
+                ");
 
             // Delete room from open rooms
             $db->bind_req($res_room_id)
@@ -83,23 +86,6 @@
                 DELETE FROM sandbox.open_rooms
                 WHERE sandbox.open_rooms.id = ?");
 
-            $func_event_tbl_name = "events_room_" . $res_room_id;
-            $func_event_tbl_pk = "room_" . $res_room_id . "_pk";
-
-            $db = new utils_database(utils_database::new_connection_events());
-
-            // Create event table for room
-            $db->exec_db("
-                create table " . $func_event_tbl_name . "
-                (
-                    event_id int auto_increment,
-                    time_issued int not null,
-                    occurs_at int not null,
-                    player_id int not null,
-                    event_msg varchar(200) not null,
-                    constraint " . $func_event_tbl_pk . "
-                        primary key (event_id)
-                );");
         } else {
 
             // Update player count

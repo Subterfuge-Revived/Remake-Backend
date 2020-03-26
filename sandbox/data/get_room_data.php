@@ -29,7 +29,7 @@
         if( $in_room_status === 1 ) {
 
             $func_temp_stmt =
-                "SELECT room_id, creator_id, rated, player_count, min_rating, description, goal, anonymity, map, seed
+                "SELECT room_id, creator_id, started_at, rated, player_count, min_rating, description, goal, anonymity, map, seed
                  FROM sandbox.player_open_room
                  INNER JOIN sandbox.ongoing_rooms o on player_open_room.room_id = o.id AND player_open_room.player_id=?";
         }
@@ -37,7 +37,7 @@
         // Get Room Data (either player specific or all)
         $db->bind_req($func_player_id);
         if( $in_room_status === 1 )
-            $db->bind_res($res_room_id, $res_creator_id, $res_rated,
+            $db->bind_res($res_room_id, $res_creator_id, $res_started_at, $res_rated,
                 $res_max_players, $res_min_rating, $res_description, $res_goal, $res_anonymity,
                 $res_map, $res_seed);
         else
@@ -79,7 +79,7 @@
             }
         }
 
-        $json->success_get_open_rooms($res_room_id, $res_creator_id, $res_rated, $res_max_players,
+        $json->success_get_open_rooms($res_room_id, $res_creator_id, $res_started_at, $res_rated, $res_max_players,
             $res_min_rating, $res_description, $res_goal, $res_anonymity,
             $res_map, $res_seed, $func_players, $in_room_status);
 
