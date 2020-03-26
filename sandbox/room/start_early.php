@@ -30,10 +30,12 @@
         // If Room has more than one player -> start
         if($func_player_count > 1) {
 
-            $db->bind_req($in_room_id)
+            $func_time = time();
+
+            $db->bind_req($func_time, $in_room_id)
                 ->exec_db("
-                INSERT INTO sandbox.ongoing_rooms
-                SELECT id, creator_id, rated, player_count, min_rating, description, goal, anonymity, map, seed
+                INSERT INTO sandbox.ongoing_rooms (started_at, id, creator_id, rated, player_count, min_rating, description, goal, anonymity, map, seed) 
+                SELECT ?, id, creator_id, rated, player_count, min_rating, description, goal, anonymity, map, seed
                 FROM sandbox.open_rooms
                 WHERE id=?");
 
@@ -41,24 +43,6 @@
                 ->exec_db("
                 DELETE FROM sandbox.open_rooms
                 WHERE id=?");
-
-            // Safe against injections since this part is only reached if the room_id is a valid one
-            $func_event_table       = "events_room_" . $in_room_id;
-            $func_event_table_pk    = "room_" . $in_room_id . "_pk";
-
-            $db = new utils_database(utils_database::new_connection_events());
-
-            $db->exec_db("
-            create table " . $func_event_table . "
-            (
-                event_id int auto_increment,
-                time_issued int not null,
-                occurs_at int not null,
-                player_id int not null,
-                event_msg varchar(200) not null,
-                constraint " . $func_event_table_pk . "
-                    primary key (event_id)
-            );");
 
             $json->success_start_early($in_room_id);
 
