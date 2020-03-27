@@ -5,6 +5,9 @@
      */
     $in_session_id = $sec->rm_inject(($_POST["session_id"]));
     $in_room_id = $sec->rm_inject($_POST["room_id"]);
+    $in_filter =( $sec->rm_inject($_POST["filter"]) === 'time' ) ? 0 :
+        (( $sec->rm_inject($_POST["filter"] ) === 'tick' ) ? 1 : 2);
+    $in_filter_arg = $sec->rm_inject($_POST["filter_arg"]);
 
     /*
     * Constants
@@ -35,12 +38,14 @@
             FROM sandbox.ongoing_rooms
             WHERE id=?");
 
-        $db->bind_req($in_room_id)
+        $func_filter_str = ($in_filter === 0) ? " AND time_issued > ?" : (($in_filter === 1) ? " AND occurs_at > ?" : "");
+
+        $db->bind_req($in_room_id, $in_filter_arg)
             ->bind_res($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg)
             ->exec_db("
             SELECT event_id, time_issued, occurs_at, player_id, event_msg
             FROM sandbox.events
-            WHERE room_id=?");
+            WHERE room_id=?" . $func_filter_str);
 
         $json->success_get_events($res_event_id, $res_time_issued, $res_occurs_at, $res_player_id, $res_event_msg);
 

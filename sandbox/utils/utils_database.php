@@ -80,6 +80,12 @@ class utils_database
 
         $var_types = "";
 
+        $occ = substr_count($stmt, "?");
+
+        if( $occ < count($this->bind_req) ) {
+            $this->bind_req = array_slice($this->bind_req, 0, $occ);
+        }
+
         foreach ( $this->bind_req as $var ) {
 
             if(is_int($var)) {
