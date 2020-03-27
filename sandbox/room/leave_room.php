@@ -61,7 +61,7 @@
 
         }
 
-        $json->success_join_room((int)$in_room_id);
+        $json->success_generic((int)$in_room_id);
 
     } catch (\Exception $e) {
 

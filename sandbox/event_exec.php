@@ -34,6 +34,8 @@
     $event_leave_room       = "leave_room";
     $event_start_early      = "start_early";
     $event_submit_event     = "submit_event";
+    $event_cancel_event     = "cancel_event";
+    $event_update_event     = "update_event";
     $event_get_events       = "get_events";
     $event_get_room_data    = "get_room_data";
     $event_message          = "message";
@@ -73,6 +75,14 @@
     } else if( strcmp($event_type, $event_get_events) == 0 ) {
 
         require_once 'data/get_events.php';
+
+    } else if( strcmp($event_type, $event_cancel_event) == 0 ) {
+
+        require_once 'data/cancel_events.php';
+
+    } else if( strcmp($event_type, $event_update_event) == 0 ) {
+
+        require_once 'data/update_events.php';
 
     } else if( strcmp($event_type, $event_get_room_data) == 0 ) {
 

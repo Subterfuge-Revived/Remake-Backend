@@ -96,7 +96,7 @@
                 WHERE id = ?");
         }
 
-        $json->success_join_room($res_room_id);
+        $json->success_generic($res_room_id);
     } catch (\Exception $e) {
 
         $json->fail_msg($e->getMessage());

@@ -55,7 +55,7 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
-    public function success_join_room($room_id) {
+    public function success_generic($room_id) {
 
         $arr = array(
             'success' => true,
