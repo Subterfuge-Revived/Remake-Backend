@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+    volumes:
+      - ".:/var/www"
+    ports:
+      - 80:80
+    env_file:
+      - ./.env
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - "db:/var/lib/mysql"
+      - "./mysqldump:/data"
+    ports:
+      - 3306:3306
+    env_file:
+      - ./.env
+
+volumes:
+  db: {}
