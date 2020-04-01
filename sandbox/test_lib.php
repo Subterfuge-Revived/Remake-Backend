@@ -26,5 +26,8 @@ export PATH=$PATH:{path}/dotnet-arm32/
 
 Verify the installation worked: dotnet --info
  */
+
+// Also note: the CLI current has the API endpoint URL hard coded. I will make the api URL a flag that can be passed in to the function.
+// URL is currently hardcoded to: http://localhost/subterfuge-backend/sandbox/event_exec.php
 $output = exec("dotnet lib/SubterfugeCoreCLI.dll 12341 1");
 echo $output;
