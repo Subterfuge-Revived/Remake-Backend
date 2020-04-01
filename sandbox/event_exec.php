@@ -1,6 +1,7 @@
 <?php
-    error_reporting(0);
-
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
 
     /*
      * Global Event Requirements
@@ -11,7 +12,6 @@
     require "utils/utils_database.php";
     require "utils/utils_session.php";
     require "utils/utils_json.php";
-    require "credentials.php";
 
     use mofodojodino\ProfanityFilter\Check;
 
