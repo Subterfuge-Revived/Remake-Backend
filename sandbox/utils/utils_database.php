@@ -18,7 +18,7 @@ class utils_database
     private $num_rows;
     private $insert_id;
 
-    public function __construct(mysqli &$con) {
+    public function __construct(mysqli $con) {
 
         $this->con = $con;
         $this->error_if_num_row_zero = false;
@@ -148,11 +148,17 @@ class utils_database
         return self::connect("events_ongoing_rooms");
     }
 
-    private static function connect($db_database) {
-        $credentials = new credentials();
-        $db_servername = "localhost";
-        $db_username = $credentials->get_username();
-        $db_password = $credentials->get_password();
-        return new mysqli($db_servername, $db_username, $db_password, $db_database);
+    /**
+     * Connect to the database.
+     *
+     * @return mysqli
+     */
+    private static function connect(): mysqli {
+        return new mysqli(
+            getenv('MYSQL_HOST') ,
+            getenv('MYSQL_USER'),
+            getenv('MYSQL_PASSWORD'),
+            getenv('MYSQL_DATABASE')
+        );
     }
 }
