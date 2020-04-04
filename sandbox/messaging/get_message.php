@@ -30,7 +30,9 @@ try {
       SELECT *
       FROM messages
       ");
-  $json->success_get_messages($res_room_id, $res_time_issued, $res_sender_id, $res_recipient_id, $res_message, $in_timestamp);
+
+
+  $json->success_get_messages($res_room_id, $res_time_issued, $res_sender_id, $res_recipient_id, $res_message, $in_timestamp, $func_player_id);
 
 } catch (\Exception $e) {
 

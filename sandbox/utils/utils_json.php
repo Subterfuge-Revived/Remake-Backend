@@ -156,20 +156,21 @@ class utils_json
         http_response_code(httpStatusCode::OK);
     }
 
-    public function success_get_messages($res_room_id, $res_time_issued, $res_sender_id, $res_recipient_id, $res_message, $in_timestamp) {
+    public function success_get_messages($res_room_id, $res_time_issued, $res_sender_id, $res_recipient_id, $res_message, $in_timestamp, $func_player_id) {
 
         $arr = array();
 
         foreach( $res_time_issued as $i => $el ) {
           if($res_time_issued[$i] >= $in_timestamp){
-
-              $arr[$i] = array(
-                  "room_id" => $res_room_id[$i],
-                  "time_issued" => $res_time_issued[$i],
-                  "sender_id" => $res_sender_id[$i],
-                  "recipient_id" => $res_recipient_id[$i],
-                  "message" => $res_message[$i]
-              );
+              if($func_player_id == $res_sender_id[$i] || $func_player_id == $res_recipient_id[$i]) {
+                  $arr[$i] = array(
+                      "room_id" => $res_room_id[$i],
+                      "time_issued" => $res_time_issued[$i],
+                      "sender_id" => $res_sender_id[$i],
+                      "recipient_id" => $res_recipient_id[$i],
+                      "message" => $res_message[$i]
+                  );
+              }
           }
         }
 
