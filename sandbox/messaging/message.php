@@ -60,6 +60,7 @@ try {
                           INSERT INTO messages (room_id, time_issued, sender_id, recipient_id, message)
                           VALUES (?,?,?,?,?)");
 
+
                           $json->success_send_message($in_message, $in_room_id, $in_other_player_id);
 
       }

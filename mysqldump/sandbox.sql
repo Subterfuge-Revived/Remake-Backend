@@ -990,12 +990,12 @@ DROP TABLE IF EXISTS `messages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `messages` (
-  `room_id` int(11) NOT NULL AUTO_INCREMENT,
+  `room_id` int(11) NOT NULL,
   `time_issued` int(11) NOT NULL,
   `sender_id` int(11) NOT NULL,
   `recipient_id` int(11) NOT NULL,
   `message` varchar(250) NOT NULL,
-  PRIMARY KEY (`room_id`)
+  PRIMARY KEY (`time_issued`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1 COMMENT='All messages';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
