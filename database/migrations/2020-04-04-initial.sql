@@ -1,4 +1,4 @@
-grant all privileges on *.* to test@'%';
+grant all privileges on *.* to subterfuge@'%';
 
 create database if not exists `sandbox`;
 use sandbox;
