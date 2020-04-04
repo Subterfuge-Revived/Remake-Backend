@@ -16,7 +16,7 @@ services:
     image: mysql:5.7
     volumes:
       - "db:/var/lib/mysql"
-      - "./mysqldump:/data"
+      - "./database:/data"
     ports:
       - 3306:3306
     env_file:
