@@ -23,7 +23,8 @@
         }
 
         // Connect to sandbox database
-        $db = new utils_database(utils_database::new_connection());
+        $conn = utils_database::new_connection();
+        $db = new utils_database($conn);
 
         // Fetch player id and password, if player exits error out
         $db->bind_req($in_player_name)

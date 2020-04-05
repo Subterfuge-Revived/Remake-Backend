@@ -40,3 +40,6 @@ docker-compose exec db bash
 cat /data/migrations/*sql | mysql -u root -p
 [enter MySQL root paassword as specified in .env file]
 ```
+
+Once completed, access `http://localhost` or `http://localhost/event_exec.php`.
+In the backend php files, the domain `db` will resolve to the `db` docker service, allowing database connections.

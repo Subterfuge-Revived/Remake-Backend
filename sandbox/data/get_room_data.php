@@ -3,9 +3,26 @@
     /*
      * Input
      */
-    $in_session_id          = $sec->rm_inject(($_POST["session_id"]));
-    $in_room_status         = $sec->rm_inject(($_POST["room_status"])) === 'ongoing' ? 1 : 0;
-    $in_filter_by_player    = $sec->rm_inject(($_POST["filter_by_player"])) === 'true' ? 1 : 0;
+
+    if(isset($_POST["session_id"])){
+
+        $in_session_id          = $sec->rm_inject(($_POST["session_id"]));
+
+        if(isset($_POST["room_status"])) {
+            $in_room_status = $sec->rm_inject(($_POST["room_status"])) === 'ongoing' ? 1 : 0;
+        } else {
+            $in_room_status = 0;
+        }
+
+        if(isset($_POST["filter_by_player"])){
+            $in_filter_by_player    = $sec->rm_inject(($_POST["filter_by_player"])) === 'true' ? 1 : 0;
+        } else {
+            $in_filter_by_player = 0;
+        }
+
+    } else {
+        $json->fail_msg("Unauthorized.");
+    }
 
     // Begin
     try {

@@ -100,14 +100,25 @@ class utils_database
             }
         }
 
-        $run = $this->con->prepare($stmt);
+        $statement = $this->con->prepare($stmt);
 
-        call_user_func_array(array($run, "bind_param"), array_merge(array($var_types), $this->bind_req));
+        // Prepare statement can return false. If false, need to return early.
+        // IF false, this usually means the query is incorrect and cannot bind. Look at the SQL to ensure it is correct.
+        if(!$statement) {
+            throw new \Exception("Malformed SQL Exception.");
+        }
 
-        $run->execute();
+        call_user_func_array(array($statement, 'bind_param'), array_merge(array($var_types), $this->bind_req));
 
-        $p = $run->get_result();
+        $statement->execute();
 
+        $p = $statement->get_result();
+
+        if(!$p) {
+            // No results from database.
+            // Likely an update or insert.
+            return;
+        }
         $this->num_rows = $p->num_rows;
         $this->insert_id = $this->con->insert_id;
 
@@ -154,11 +165,16 @@ class utils_database
      * @return mysqli
      */
     private static function connect(): mysqli {
-        return new mysqli(
-            getenv('MYSQL_HOST') ,
+        $mysqli = new mysqli(
+            'db:3306',
             getenv('MYSQL_USER'),
             getenv('MYSQL_PASSWORD'),
             getenv('MYSQL_DATABASE')
         );
+        if (!$mysqli) {
+            echo "{ 'success': false, 'message': 'Unable to connect to mysql' }";
+            die;
+        }
+        return $mysqli;
     }
 }
