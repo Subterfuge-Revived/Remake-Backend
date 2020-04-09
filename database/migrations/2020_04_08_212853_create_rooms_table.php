@@ -23,6 +23,8 @@ class CreateRoomsTable extends Migration
             $table->string('description')->nullable(); // NOTE: made nullable
             $table->boolean('is_rated')->default(0); // NOTE: rename from "rated"
             $table->boolean('is_anonymous')->default(0); // NOTE: rename from "anonymity"
+            $table->integer('min_rating')->default(0);
+            $table->integer('max_players');
             $table->integer('map'); // What does this mean?
             $table->integer('seed');
 
