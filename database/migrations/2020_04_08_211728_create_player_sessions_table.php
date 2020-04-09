@@ -16,6 +16,7 @@ class CreatePlayerSessionsTable extends Migration
         Schema::create('player_sessions', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->dateTime('expires_at');
             $table->unsignedBigInteger('player_id');
             $table->string('token')->unique();
 
