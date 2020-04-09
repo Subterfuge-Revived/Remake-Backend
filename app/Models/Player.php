@@ -123,7 +123,7 @@ class Player extends Authenticatable
      */
     public function new_token()
     {
-        $token = Str::random(80);
+        $token = \Str::random(80);
         $this->player_sessions()->save(new PlayerSession([
             'token' => $token,
         ]));

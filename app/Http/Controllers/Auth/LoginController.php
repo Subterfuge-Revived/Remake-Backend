@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Player;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
@@ -58,8 +58,8 @@ class LoginController extends Controller
             'name' => $request->get('username'),
             'password' => $request->get('password'),
         ])) {
-            $user = User::whereName($request->get('username'))->first();
-            $token = $user->refresh_token();
+            $player = Player::whereName($request->get('username'))->first();
+            $token = $player->new_token();
             return new Response(['token' => $token]);
         }
 
