@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -27,6 +28,9 @@ Route::post('/', function(Request $request) {
     }
     if ($type === 'login') {
         return (new LoginController())->login($request);
+    }
+    if ($type === 'new_room') {
+        return (new RoomController())->create($request);
     }
 
     throw ValidationException::withMessages([
