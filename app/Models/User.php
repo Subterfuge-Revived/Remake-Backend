@@ -9,6 +9,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * App\User
@@ -66,4 +67,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Refresh the user's API token.
+     *
+     * @return string
+     */
+    public function refresh_token()
+    {
+        $token = Str::random(80);
+        $this->forceFill([
+            'api_token' => hash('sha256', $token),
+        ]);
+        $this->save();
+
+        return $token;
+    }
 }
