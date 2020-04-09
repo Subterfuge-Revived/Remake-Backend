@@ -1,7 +1,6 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\User;
+use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,12 +19,11 @@ Route::post('/', function(Request $request) {
 
     $type = $request->get('type');
 
-    if ($type === 'login') {
-        User::all();
-        return (new LoginController())->login($request);
+    if ($type === 'register') {
+        return (new RegisterController())->register($request);
     }
 
-    return;
+    throw new UnexpectedValueException("Unexpected request type: $type", 500);
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use App\User;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-use Psy\Util\Str;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class RegisterController extends Controller
 {
@@ -42,6 +46,22 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    public function register(Request $request) {
+        $this->validator($request->all())->validate();
+
+        list($token, $user) = $this->create($request->all());
+
+        event(new Registered($user));
+
+        $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
+
+        return new Response(['token' => $token], 200);
+    }
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -51,9 +71,9 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'name')],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'string', 'min:8'],
         ]);
     }
 
@@ -61,15 +81,18 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param array $data
-     * @return User
+     * @return array
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
+        $token = Str::random(80);
+        $user = User::create([
+            'name' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'api_token' => hash('sha256', \Illuminate\Support\Str::random(80))
+            'api_token' => hash('sha256', $token)
         ]);
+
+        return [$token, $user];
     }
 }
