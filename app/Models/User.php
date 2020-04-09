@@ -8,8 +8,9 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Eloquent;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class User
@@ -36,8 +37,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static Builder|User whereUpdatedAt($value)
  * @mixin Eloquent
  */
-class User extends Model
+class User extends Authenticatable
 {
+    use Notifiable;
+
     protected $table = 'users';
 
     protected $dates = [
