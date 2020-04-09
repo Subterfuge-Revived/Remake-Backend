@@ -16,7 +16,7 @@ class CreatePlayersTable extends Migration
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('name'); // NOTE: Renamed from player_name
+            $table->string('name')->unique(); // NOTE: Renamed from player_name
             $table->string('password');
             $table->string('email')->unique()->nullable();
             $table->integer('rating')->default(1200); // TODO: Is this a good default value?
