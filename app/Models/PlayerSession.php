@@ -83,4 +83,13 @@ class PlayerSession extends Model
 
         return parent::save($options);
     }
+
+    /**
+     * Returns whether the session is valid.
+     *
+     * @return bool
+     */
+    public function isValid() {
+	    return Carbon::now()->isBefore($this->expires_at);
+    }
 }
