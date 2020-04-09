@@ -10,8 +10,9 @@ use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class Player
@@ -52,64 +53,82 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static Builder|Player whereWins($value)
  * @mixin Eloquent
  */
-class Player extends Model
+class Player extends Authenticatable
 {
 
-	protected $dates = [
-		'last_online_at'
-	];
+    use Notifiable;
 
-	protected $hidden = [
-		'password'
-	];
+    protected $dates = [
+        'last_online_at',
+    ];
 
-	protected $fillable = [
-		'name',
-		'password',
-		'email',
-		'rating',
-		'wins',
-		'resignations',
-		'last_online_at'
-	];
+    protected $hidden = [
+        'password',
+    ];
 
-    /**
-     * @return HasMany
-     */
-	public function blocks()
-	{
-		return $this->hasMany(Block::class, 'sender_player_id');
-	}
+    protected $fillable = [
+        'name',
+        'password',
+        'email',
+        'rating',
+        'wins',
+        'resignations',
+        'last_online_at',
+    ];
 
     /**
      * @return HasMany
      */
-	public function events()
-	{
-		return $this->hasMany(Event::class);
-	}
+    public function blocks()
+    {
+        return $this->hasMany(Block::class, 'sender_player_id');
+    }
 
     /**
      * @return HasMany
      */
-	public function messages()
-	{
-		return $this->hasMany(Message::class, 'sender_player_id');
-	}
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 
     /**
      * @return HasMany
      */
-	public function rooms()
-	{
-		return $this->hasMany(Room::class, 'creator_player_id');
-	}
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_player_id');
+    }
 
     /**
      * @return HasMany
      */
-	public function player_sessions()
-	{
-		return $this->hasMany(PlayerSession::class);
-	}
+    public function rooms()
+    {
+        return $this->hasMany(Room::class, 'creator_player_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function player_sessions()
+    {
+        return $this->hasMany(PlayerSession::class);
+    }
+
+    /**
+     * Add an API token.
+     *
+     * @return string
+     */
+    public function new_token()
+    {
+        $token = Str::random(80);
+        $this->player_sessions()->save(new PlayerSession([
+            'token' => $token,
+        ]));
+
+        return $token;
+    }
+
 }

@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Player;
+use App\Models\PlayerSession;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
@@ -53,7 +56,8 @@ class RegisterController extends Controller
      * @return Response|mixed
      * @throws ValidationException
      */
-    public function register(Request $request) {
+    public function register(Request $request)
+    {
         $this->validator($request->all())->validate();
 
         $profanityCheck = new ProfanityCheck();
@@ -85,8 +89,8 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'name')],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'username' => ['required', 'string', 'max:255', Rule::unique('players', 'name')],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:players'],
             'password' => ['required', 'string', 'min:8'],
         ]);
     }
@@ -99,13 +103,17 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        $token = Str::random(80);
-        $user = User::create([
+        $token = \Str::random(80);
+        $user = Player::create([
             'name' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'api_token' => hash('sha256', $token)
+            'last_online_at' => Carbon::now(),
         ]);
+
+        $user->player_sessions()->save(new PlayerSession([
+            'token' => $token,
+        ]));
 
         return [$token, $user];
     }
