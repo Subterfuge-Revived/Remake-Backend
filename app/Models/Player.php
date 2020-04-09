@@ -12,7 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
+use Str;
 
 /**
  * Class Player
@@ -52,6 +55,10 @@ use Illuminate\Notifications\Notifiable;
  * @method static Builder|Player whereUpdatedAt($value)
  * @method static Builder|Player whereWins($value)
  * @mixin Eloquent
+ * @property-read Collection|Room[] $created_rooms
+ * @property-read int|null $created_rooms_count
+ * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
+ * @property-read int|null $notifications_count
  */
 class Player extends Authenticatable
 {
@@ -82,6 +89,14 @@ class Player extends Authenticatable
     public function blocks()
     {
         return $this->hasMany(Block::class, 'sender_player_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function created_rooms()
+    {
+        return $this->hasMany(Room::class, 'creator_player_id', 'id');
     }
 
     /**
@@ -123,7 +138,7 @@ class Player extends Authenticatable
      */
     public function new_token()
     {
-        $token = \Str::random(80);
+        $token = Str::random(80);
         $this->player_sessions()->save(new PlayerSession([
             'token' => $token,
         ]));
