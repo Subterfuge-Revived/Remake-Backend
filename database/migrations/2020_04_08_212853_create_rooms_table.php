@@ -29,7 +29,7 @@ class CreateRoomsTable extends Migration
             $table->integer('seed');
 
             $table->foreign('creator_player_id')->references('id')->on('players');
-            // NOTE: removed columns: player_count, min_rating
+            $table->foreign('goal_id')->references('id')->on('goals');
 
         });
     }
