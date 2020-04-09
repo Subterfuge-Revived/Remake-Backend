@@ -24,19 +24,24 @@ class RoomController extends Controller
     {
         // FIXME: We cannot put this in a middleware (yet) because the same API endpoint
         // (the root endpoint) is used both for authenticated and non-authenticated purposes.
-        $session = PlayerSession::whereToken($request->get('token'))->first();
+        $session = PlayerSession::whereToken(hash('sha256', $request->get('token')))->first();
         if (!$session || !$session->isValid()) {
             return new Response('', 401);
         }
 
-        \Validator::make($request->all(), [
+        $validator = \Validator::make($request->all(), [
             'max_players' => 'required|int|between:2,10',
             'goal' => 'required|int', // FIXME: We should not require the client to send goal IDs but rather identifiers
             'description' => 'required|string',
             'map' => 'required|int|between:0,3',
             'min_rating' => 'required|int|min:0', // TODO: Make this optional for open games?
             'rated' => 'required|boolean',
+            'anonymity' => 'required|boolean',
         ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
 
         $minRating = $request->get('rated')
             ? $request->get('min_rating')
@@ -53,6 +58,8 @@ class RoomController extends Controller
             'description' => $request->get('description'),
             'is_rated' => $request->get('rated'),
             'is_anonymous' => $request->get('anonymity'),
+            'max_players' => $request->get('max_players'),
+            'min_rating' => $minRating,
             'map' => $request->get('map'),
             'seed' => Carbon::now()->unix(),
         ]));
