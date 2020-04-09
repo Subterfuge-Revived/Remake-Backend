@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use mofodojodino\ProfanityFilter\Check as ProfanityCheck;
 
 class RegisterController extends Controller
 {
@@ -46,8 +48,20 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
+    /**
+     * @param Request $request
+     * @return Response|mixed
+     * @throws ValidationException
+     */
     public function register(Request $request) {
         $this->validator($request->all())->validate();
+
+        $profanityCheck = new ProfanityCheck();
+        if ($profanityCheck->hasProfanity($request->get('username'))) {
+            throw ValidationException::withMessages([
+                'Username contains profanity',
+            ]);
+        }
 
         list($token, $user) = $this->create($request->all());
 
