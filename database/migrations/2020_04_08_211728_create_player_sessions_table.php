@@ -17,7 +17,7 @@ class CreatePlayerSessionsTable extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('player_id');
-            $table->string('session_id')->unique(); // TODO: How long is text? Should we use test/mediumtext/longtext instead?
+            $table->string('token')->unique();
 
             $table->foreign('player_id')
                 ->references('id')
