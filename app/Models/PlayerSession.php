@@ -100,6 +100,16 @@ class PlayerSession extends Model
      * @return PlayerSession|null
      */
     public static function findByToken(string $token) {
-        return self::whereToken(hash('sha256', $token))->first();
+        return self::whereToken(self::hash($token))->first();
+    }
+
+    /**
+     * Return the hash of the given token.
+     *
+     * @param string $token
+     * @return string
+     */
+    public static function hash(string $token) {
+        return hash('sha256', $token);
     }
 }

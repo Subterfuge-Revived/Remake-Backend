@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\PlayerSession;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AuthenticateAPI extends Authenticate
@@ -17,7 +18,7 @@ class AuthenticateAPI extends Authenticate
      */
     public function handle($request, \Closure $next, ...$guards)
     {
-        $session = PlayerSession::whereToken(hash('sha256', $request->input('token')))->first();
+        $session = PlayerSession::findByToken($request->input('session_id'));
         if (!$session || !$session->isValid()) {
             return response('')->setStatusCode(401);
         }
