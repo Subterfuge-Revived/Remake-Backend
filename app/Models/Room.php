@@ -134,4 +134,8 @@ class Room extends Model
     public function hasStarted() {
         return $this->started_at !== null;
     }
+
+    public function hasEnded() {
+        return $this->closed_at !== null;
+    }
 }
