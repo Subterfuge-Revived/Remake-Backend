@@ -15,6 +15,18 @@ use Illuminate\Validation\ValidationException;
 
 class RoomController extends Controller
 {
+
+    /**
+     * RoomController constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        // Enforce API authentication for each request.
+        $this->middleware('auth.api');
+    }
+
     /**
      * Show a room.
      *
@@ -59,27 +71,19 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-
-        // FIXME: We cannot put this in a middleware (yet) because the same API endpoint
-        // (the root endpoint) is used both for authenticated and non-authenticated purposes.
-        $session = PlayerSession::whereToken(hash('sha256', $request->get('token')))->first();
-        if (!$session || !$session->isValid()) {
-            return response('')->setStatusCode(401);
-        }
-
         $this->validator($request)->validate();
 
         $minRating = $request->get('rated')
             ? $request->get('min_rating')
             : 0;
 
-        if ($session->player->rating < $minRating) {
+        if ($this->session->player->rating < $minRating) {
             throw ValidationException::withMessages(['Invalid minimum rating']);
         }
 
         // Create the room and associate it with its creator
         /** @var Room $room */
-        $room = $session->player->created_rooms()->save(new Room([
+        $room = $this->session->player->created_rooms()->save(new Room([
             'goal_id' => $request->get('goal'),
             'description' => $request->get('description'),
             'is_rated' => $request->get('rated'),
@@ -92,14 +96,15 @@ class RoomController extends Controller
 
         // Add the creator to the room
         $playerRoom = new PlayerRoom();
-        $playerRoom->player()->associate($session->player);
+        $playerRoom->player()->associate($this->session->player);
         $playerRoom->room()->associate($room);
 
+        dd(' success' );
         return response([
             'success' => true,
             'created_room' => [
                 'room_id' => $room->id,
-                'creator' => $session->player->id,
+                'creator' => $this->session->player->id,
                 'description' => $room->description,
                 'rated' => (bool)$room->is_rated,
                 'max_players' => $room->max_players,
@@ -155,19 +160,12 @@ class RoomController extends Controller
      */
     public function destroy($roomId, Request $request)
     {
-        // FIXME: We cannot put this in a middleware (yet) because the same API endpoint
-        // (the root endpoint) is used both for authenticated and non-authenticated purposes.
-        $session = PlayerSession::whereToken(hash('sha256', $request->get('token')))->first();
-        if (!$session || !$session->isValid()) {
-            return response('')->setStatusCode(401);
-        }
-
         if (!$room = Room::whereId($roomId)->first()) {
             return response('')->setStatusCode(404);
         }
 
         // Only the creator of a room can destroy it. Return unauthorized otherwise.
-        if (!$room->creator_player == $session->player) {
+        if (!$room->creator_player == $this->session->player) {
             return response('')->setStatusCode(401);
         }
 

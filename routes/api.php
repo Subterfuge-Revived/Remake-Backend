@@ -40,8 +40,3 @@ Route::post('/', function(Request $request) {
 
 
 Route::resource('/rooms', 'RoomController');
-
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});

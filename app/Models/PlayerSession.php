@@ -92,4 +92,14 @@ class PlayerSession extends Model
     public function isValid() {
 	    return Carbon::now()->isBefore($this->expires_at);
     }
+
+    /**
+     * Fetch a session from a token.
+     *
+     * @param string $token
+     * @return PlayerSession|null
+     */
+    public static function findByToken(string $token) {
+        return self::whereToken(hash('sha256', $token))->first();
+    }
 }
