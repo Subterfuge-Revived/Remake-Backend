@@ -35,6 +35,9 @@ Route::post('/', function (Request $request) {
     if ($type === 'join_room') {
         return (new RoomController())->join($request);
     }
+    if ($type === 'leave_room') {
+        return (new RoomController())->leave($request);
+    }
 
     throw ValidationException::withMessages([
         "Unexpected request type: $type",

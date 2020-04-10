@@ -202,4 +202,34 @@ class RoomController extends Controller
             'room' => $room->id,
         ]);
     }
+
+    /**
+     * Leave a room.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws ValidationException|\Exception
+     */
+    public function leave(Request $request)
+    {
+        if (!$room = Room::whereId($request->input('room_id'))->first()) {
+            return response('', 404);
+        }
+
+        if (!$room->players->contains($this->session->player)) {
+            throw ValidationException::withMessages(['Player is not in the room']);
+        }
+
+        $room->players()->where('id', $this->session->player->id)->detach();
+
+        $room->refresh();
+        if ($room->players->isEmpty()) {
+            $room->delete();
+        }
+
+        return response([
+            'success' => true,
+            'room' => $room->id, // FIXME: The room may have been deleted! Why are we returning its id?
+        ]);
+    }
 }
