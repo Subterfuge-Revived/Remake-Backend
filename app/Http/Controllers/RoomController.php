@@ -26,7 +26,7 @@ class RoomController extends Controller
         // (the root endpoint) is used both for authenticated and non-authenticated purposes.
         $session = PlayerSession::whereToken(hash('sha256', $request->get('token')))->first();
         if (!$session || !$session->isValid()) {
-            return new Response('', 401);
+            return response()->setStatusCode(401);
         }
 
         $validator = \Validator::make($request->all(), [
