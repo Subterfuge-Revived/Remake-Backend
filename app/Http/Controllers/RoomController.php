@@ -99,7 +99,6 @@ class RoomController extends Controller
         $playerRoom->player()->associate($this->session->player);
         $playerRoom->room()->associate($room);
 
-        dd(' success' );
         return response([
             'success' => true,
             'created_room' => [
