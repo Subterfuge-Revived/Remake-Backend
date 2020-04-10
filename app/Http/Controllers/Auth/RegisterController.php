@@ -67,17 +67,20 @@ class RegisterController extends Controller
             ]);
         }
 
-        list($token, $user) = $this->create($request->all());
+        list($token, $player) = $this->create($request->all());
 
-        event(new Registered($user));
+        event(new Registered($player));
 
-        $this->guard()->login($user);
+        $this->guard()->login($player);
 
-        if ($response = $this->registered($request, $user)) {
-            return $response;
-        }
-
-        return new Response(['token' => $token], 200);
+        return new Response([
+            'success' => true,
+            'player' => [
+                'id' => $player->id,
+                'name' => $player->name,
+            ],
+            'token' => $token,
+        ]);
     }
 
     /**

@@ -60,7 +60,14 @@ class LoginController extends Controller
         ])) {
             $player = Player::whereName($request->get('username'))->first();
             $token = $player->new_token();
-            return new Response(['token' => $token]);
+            return new Response([
+                'success' => true,
+                'user' => [
+                    'id' => $player->id,
+                    'name' => $player->name,
+                ],
+                'token' => $token,
+            ]);
         }
 
         throw ValidationException::withMessages([
