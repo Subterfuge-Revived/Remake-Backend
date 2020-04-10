@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\PlayerRoom;
-use App\Models\PlayerSession;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -153,11 +152,10 @@ class RoomController extends Controller
      * Destroy a room.
      *
      * @param $roomId
-     * @param Request $request
      * @return ResponseFactory|Response|object
      * @throws \Exception
      */
-    public function destroy($roomId, Request $request)
+    public function destroy($roomId)
     {
         if (!$room = Room::whereId($roomId)->first()) {
             return response('')->setStatusCode(404);
