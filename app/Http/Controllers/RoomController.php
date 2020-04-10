@@ -27,24 +27,6 @@ class RoomController extends Controller
     }
 
     /**
-     * Show a room.
-     *
-     * @param int $roomId
-     * @param Request $request
-     * @return ResponseFactory|Response|object
-     */
-    public function show(int $roomId, Request $request)
-    {
-        // TODO: Determine whether a user must be authenticated to use this API.
-
-        if (!$room = Room::whereId($roomId)->first()) {
-            return response('')->setStatusCode(404);
-        }
-
-        return response($room);
-    }
-
-    /**
      * @param Request $request
      * @return Validator
      */
@@ -59,6 +41,23 @@ class RoomController extends Controller
             'rated' => 'required|boolean',
             'anonymity' => 'required|boolean',
         ]);
+    }
+
+    /**
+     * Show a room.
+     *
+     * @param int $roomId
+     * @return ResponseFactory|Response|object
+     */
+    public function show(int $roomId)
+    {
+        // TODO: Determine whether a user must be authenticated to use this API.
+
+        if (!$room = Room::whereId($roomId)->first()) {
+            return response('')->setStatusCode(404);
+        }
+
+        return response($room);
     }
 
     /**
@@ -169,5 +168,38 @@ class RoomController extends Controller
         $room->delete();
 
         return response('')->setStatusCode(204);
+    }
+
+    /**
+     * Join a room.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws ValidationException
+     */
+    public function join(Request $request)
+    {
+        if (!$room = Room::whereId($request->input('room_id'))->first()) {
+            return response('', 404);
+        }
+
+        if ($this->session->player->rating < $room->min_rating) {
+            throw ValidationException::withMessages(['Insufficient rating']);
+        }
+
+        if (count($room->players) == $room->max_players) {
+            throw ValidationException::withMessages(['Room is already full']);
+        }
+
+        if ($room->players->contains($this->session->player)) {
+            throw ValidationException::withMessages(['Player is already in the room']);
+        }
+
+        $room->players()->save($this->session->player);
+
+        return response([
+            'success' => true,
+            'room' => $room->id,
+        ]);
     }
 }

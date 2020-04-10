@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 |
 */
 
-Route::post('/', function(Request $request) {
+Route::post('/', function (Request $request) {
 
     // FIXME: These should all be different routes and not all registered to the document root.
     $type = $request->get('type');
@@ -32,11 +32,14 @@ Route::post('/', function(Request $request) {
     if ($type === 'new_room') {
         return (new RoomController())->store($request);
     }
+    if ($type === 'join_room') {
+        return (new RoomController())->join($request);
+    }
 
     throw ValidationException::withMessages([
-        "Unexpected request type: $type"
+        "Unexpected request type: $type",
     ]);
 });
 
-
+// RESTful API for rooms
 Route::resource('/rooms', 'RoomController');
