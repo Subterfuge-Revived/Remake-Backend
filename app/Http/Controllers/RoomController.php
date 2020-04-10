@@ -121,12 +121,17 @@ class RoomController extends Controller
      * @param $roomId
      * @param Request $request
      * @return ResponseFactory|Response|object
+     * @throws ValidationException
      */
     public function update($roomId, Request $request)
     {
         $this->validator($request)->validate();
         if (!$room = Room::whereId($roomId)->first()) {
             return response('')->setStatusCode(404);
+        }
+
+        if ($room->hasStarted()) {
+            throw ValidationException::withMessages(['Room has already started']);
         }
 
         $minRating = $request->get('rated')
@@ -193,6 +198,10 @@ class RoomController extends Controller
 
         if ($room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is already in the room']);
+        }
+
+        if ($room->hasStarted()) {
+            throw ValidationException::withMessages(['Room has already started']);
         }
 
         $room->players()->save($this->session->player);
