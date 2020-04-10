@@ -38,6 +38,9 @@ Route::post('/', function (Request $request) {
     if ($type === 'leave_room') {
         return (new RoomController())->leave($request);
     }
+    if ($type === 'start_early') {
+        return (new RoomController())->startEarly($request);
+    }
 
     throw ValidationException::withMessages([
         "Unexpected request type: $type",

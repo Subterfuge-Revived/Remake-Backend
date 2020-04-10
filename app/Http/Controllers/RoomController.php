@@ -252,6 +252,7 @@ class RoomController extends Controller
 
     /**
      * Start a room early.
+     * TODO: This method is called "start early" but we should call a "start" function instead.
      *
      * @param Request $request
      * @return ResponseFactory|Response
