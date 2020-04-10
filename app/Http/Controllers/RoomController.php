@@ -277,6 +277,7 @@ class RoomController extends Controller
         }
 
         $room->started_at = Carbon::now();
+        $room->save();
 
         return response([
             'success' => true,
