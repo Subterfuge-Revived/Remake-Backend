@@ -125,4 +125,13 @@ class Room extends Model
             ->withPivot('id')
             ->withTimestamps();
     }
+
+    /**
+     * Whether the game has started.
+     *
+     * @return bool
+     */
+    public function hasStarted() {
+        return $this->started_at !== null;
+    }
 }

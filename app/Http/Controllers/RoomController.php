@@ -161,7 +161,7 @@ class RoomController extends Controller
         }
 
         // Only the creator of a room can destroy it. Return unauthorized otherwise.
-        if (!$room->creator_player == $this->session->player) {
+        if ($room->creator_player != $this->session->player) {
             return response('')->setStatusCode(401);
         }
 
@@ -220,6 +220,14 @@ class RoomController extends Controller
             throw ValidationException::withMessages(['Player is not in the room']);
         }
 
+        // TODO: Should we allow a player to leave a room even after the game has started?
+        // As long as we retain messages and events, it should not cause any problems.
+        // This would be an effective way of resigning the game since a re-join will be impossible.
+        // However, it also refuses the resigned player access to spectate the game.
+        if ($room->hasStarted()) {
+            throw ValidationException::withMessages(['Cannot leave a room after it has started']);
+        }
+
         $room->players()->where('id', $this->session->player->id)->detach();
 
         $room->refresh();
@@ -230,6 +238,39 @@ class RoomController extends Controller
         return response([
             'success' => true,
             'room' => $room->id, // FIXME: The room may have been deleted! Why are we returning its id?
+        ]);
+    }
+
+    /**
+     * Start a room early.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws ValidationException
+     */
+    public function startEarly(Request $request)
+    {
+        if (!$room = Room::whereId($request->input('room_id'))->first()) {
+            return response('', 404);
+        }
+
+        if ($room->creator_player != $this->session->player) {
+            return response('', 401);
+        }
+
+        if ($room->hasStarted()) {
+            throw ValidationException::withMessages(['Room has already started']);
+        }
+
+        if (count($room->players) < 2) {
+            throw ValidationException::withMessages(['Room needs at least 2 players to start']);
+        }
+
+        $room->started_at = Carbon::now();
+
+        return response([
+            'success' => true,
+            'room' => $room->id,
         ]);
     }
 }
