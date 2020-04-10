@@ -18,6 +18,6 @@ class Controller extends BaseController
 
     public function __construct()
     {
-        $this->session = PlayerSession::findByToken(RequestFacade::input('token'));
+        $this->session = PlayerSession::findByToken(RequestFacade::input('session_id'));
     }
 }
