@@ -58,7 +58,7 @@ class RegisterController extends Controller
      */
     public function register(Request $request)
     {
-        $this->validator($request->all())->validate();
+        $this->validator($request)->validate();
 
         $profanityCheck = new ProfanityCheck();
         if ($profanityCheck->hasProfanity($request->get('username'))) {
@@ -86,12 +86,12 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param array $data
+     * @param Request $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(Request $data)
     {
-        return Validator::make($data, [
+        return Validator::make($data->all(), [
             'username' => ['required', 'string', 'between:4,255', Rule::unique('players', 'name')],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:players'],
             'password' => ['required', 'string', 'min:2'],
