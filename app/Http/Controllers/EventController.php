@@ -7,6 +7,7 @@ use App\Models\Room;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
@@ -30,6 +31,13 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
+        $this->validator($request)->validate();
+
+        json_decode($request->input('event_msg'));
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw ValidationException::withMessages(['Invalid event message: not valid JSON']);
+        }
+
         if (!$room = Room::whereId($request->input('room_id'))->first()) {
             return response('', 404);
         }
@@ -53,6 +61,14 @@ class EventController extends Controller
         return response([
             'success' => true,
             'room_id' => $room->id,
+        ]);
+    }
+
+    public function validator(Request $request) {
+        return Validator::make($request->all(), [
+            'room_id' => 'required|int',
+            'event_msg' => 'required|str',
+            'occurs_at' => 'required|str',
         ]);
     }
 
