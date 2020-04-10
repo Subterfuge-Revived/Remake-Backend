@@ -30,13 +30,17 @@ Route::post('/', function(Request $request) {
         return (new LoginController())->login($request);
     }
     if ($type === 'new_room') {
-        return (new RoomController())->create($request);
+        return (new RoomController())->store($request);
     }
 
     throw ValidationException::withMessages([
         "Unexpected request type: $type"
     ]);
 });
+
+
+Route::resource('/rooms', 'RoomController');
+
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
