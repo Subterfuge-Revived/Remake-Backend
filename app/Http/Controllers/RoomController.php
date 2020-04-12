@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 class RoomController extends Controller
@@ -202,9 +201,14 @@ class RoomController extends Controller
                 'max_players' => $room->max_players,
                 'players' => $room->is_anonymous
                     ? $room->players->map(function (Player $player) {
-                        return ['name' => 'Anonymous', 'id' => $player->id];})
+                        return ['name' => 'Anonymous', 'id' => $player->id];
+                    })
                     : $room->players->map(function (Player $player) {
-                        return ['name' => $player->name, 'id' => $player->id];})
+                        return ['name' => $player->name, 'id' => $player->id];
+                    }),
+                'message_groups' => $room->message_groups()->whereHas('message_group_members', function (Builder $query) {
+                    $query->where('player_id', '=', $this->session->player_id);
+                })->get(),
             ];
         });
 
