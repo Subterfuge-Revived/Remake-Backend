@@ -12,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 class EventController extends Controller
 {
     /**
+     * Show an event.
+     *
      * @param Request $request
      * @return ResponseFactory|Response
      * @throws ValidationException
@@ -62,6 +64,8 @@ class EventController extends Controller
     }
 
     /**
+     * Create an event.
+     *
      * @param Request $request
      * @return ResponseFactory|Response
      * @throws ValidationException
@@ -106,6 +110,8 @@ class EventController extends Controller
     }
 
     /**
+     * Delete an event.
+     *
      * @param Request $request
      * @return ResponseFactory|Response
      * @throws ValidationException|\Exception
@@ -117,13 +123,57 @@ class EventController extends Controller
             'event_id' => 'required|int',
         ]);
 
-        if (!$room = Room::whereId('room_id')->first()) {
+        $event = $this->getEvent($request);
+        $event->delete();
+
+        return response([
+            'success' => true,
+            'room' => $event->room->id,
+        ]);
+    }
+
+    /**
+     * Update an event.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws ValidationException
+     */
+    public function update(Request $request)
+    {
+        \Validator::make($request->all(), [
+            'room_id' => 'required|int',
+            'event_id' => 'required|int',
+            'event_msg' => 'required|string',
+        ]);
+
+        $event = $this->getEvent($request);
+        $event->event_json = json_decode($request->input('event_msg'));
+        $event->save();
+
+        return response([
+            'success' => true,
+            'room' => $event->room->id,
+        ]);
+    }
+
+    /**
+     * Validates whether the requester has access to an existing event.
+     * If so, returns the event. Otherwise, throws an exception.
+     *
+     * @param Request $request
+     * @return Event
+     * @throws ValidationException
+     */
+    private function getEvent(Request $request)
+    {
+        if (!$room = Room::whereId($request->input('room_id'))->first()) {
             throw ValidationException::withMessages(['Room does not exist']);
         }
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
         }
-        if (!$room->hasStarted() or $room->hasEnded()) {
+        if (!$room->hasStarted() || $room->hasEnded()) {
             throw ValidationException::withMessages(['Room is not ongoing']);
         }
 
@@ -135,12 +185,7 @@ class EventController extends Controller
             throw ValidationException::withMessages(['Event does not belong to the given player']);
         }
 
-        $event->delete();
-
-        return response([
-            'success' => true,
-            'room' => $room->id,
-        ]);
+        return $event;
     }
 
 }

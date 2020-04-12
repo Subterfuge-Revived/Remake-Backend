@@ -53,7 +53,7 @@ Route::post('/', function (Request $request) {
         if ($type === 'get_events') {
             return (new EventController())->index($request);
         }
-        if ($type === 'delete_events') {
+        if ($type === 'cancel_event') {
             return (new EventController())->delete($request);
         }
 
