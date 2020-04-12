@@ -63,6 +63,9 @@ Route::post('/', function (Request $request) {
         if ($type === 'message') {
             return (new MessageController())->store($request);
         }
+        if ($type === 'get_message') {
+            return (new MessageController())->index($request);
+        }
 
         throw ValidationException::withMessages([
             "Unexpected request type: $type",

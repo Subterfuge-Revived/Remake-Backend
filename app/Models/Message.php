@@ -43,6 +43,12 @@ class Message extends Model
         'message',
     ];
 
+
+    protected $visible = [
+        'sender_player_id',
+        'message',
+    ];
+
     /**
      * @return BelongsTo
      */

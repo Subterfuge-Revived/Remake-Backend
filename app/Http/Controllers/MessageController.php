@@ -48,4 +48,30 @@ class MessageController extends Controller
         // Return Created response
         return response('', 201);
     }
+
+    /**
+     * Get the messages from the given chat group.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws ValidationException
+     */
+    public function index(Request $request)
+    {
+        \Validator::make($request->all(), [
+            'group_id' => 'required|int',
+        ])->validate();
+
+        if (!$group = MessageGroup::whereId($request->input('group_id'))->first()) {
+            throw ValidationException::withMessages(['Message group does not exist']);
+        }
+
+        if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
+            throw ValidationException::withMessages(['Player is not in the message group']);
+        }
+
+        $messages = Message::whereMessageGroupId($request->input('group_id'))->get();
+
+        return response($messages);
+    }
 }
