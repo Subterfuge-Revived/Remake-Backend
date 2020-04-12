@@ -65,6 +65,6 @@ class MessageGroupController extends Controller
 
         $messageGroup->message_group_members()->saveMany($members);
 
-        return response($messageGroup, 200);
+        return response('', 201);
     }
 }
