@@ -17,8 +17,10 @@ class CreateMessageGroupMembersTable extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedBigInteger('message_group_id');
+            $table->unsignedBigInteger('player_id');
 
             $table->foreign('message_group_id')->references('id')->on('message_groups');
+            $table->foreign('player_id')->references('id')->on('players');
         });
     }
 
@@ -31,6 +33,7 @@ class CreateMessageGroupMembersTable extends Migration
     {
         Schema::table('message_group_members', function (Blueprint $table) {
             $table->dropForeign('message_group_members_message_group_id_foreign');
+            $table->dropForeign('message_group_members_player_id_foreign');
         });
 
         Schema::dropIfExists('message_group_members');
