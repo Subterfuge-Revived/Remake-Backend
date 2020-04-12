@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BlockController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\RoomController;
@@ -65,6 +66,9 @@ Route::post('/', function (Request $request) {
         }
         if ($type === 'get_message') {
             return (new MessageController())->index($request);
+        }
+        if ($type === 'block') {
+            return (new BlockController())->store($request);
         }
 
         throw ValidationException::withMessages([
