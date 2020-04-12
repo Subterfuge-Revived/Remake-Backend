@@ -16,17 +16,6 @@ class RoomController extends Controller
 {
 
     /**
-     * RoomController constructor.
-     */
-    public function __construct()
-    {
-        parent::__construct();
-
-        // Enforce API authentication for each request.
-        $this->middleware('auth.api');
-    }
-
-    /**
      * @param Request $request
      * @return Validator
      */

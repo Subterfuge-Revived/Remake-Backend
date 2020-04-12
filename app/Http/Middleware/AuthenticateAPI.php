@@ -18,7 +18,8 @@ class AuthenticateAPI extends Authenticate
      */
     public function handle($request, \Closure $next, ...$guards)
     {
-        $session = PlayerSession::findByToken($request->input('session_id'));
+        $session = PlayerSession::findByToken($request->input('session_id') ?? '');
+
         if (!$session || !$session->isValid()) {
             return response('')->setStatusCode(401);
         }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\RoomController;
+use App\Http\Middleware\AuthenticateAPI;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -30,25 +31,33 @@ Route::post('/', function (Request $request) {
     if ($type === 'login') {
         return (new LoginController())->login($request);
     }
-    if ($type === 'new_room') {
-        return (new RoomController())->store($request);
-    }
-    if ($type === 'join_room') {
-        return (new RoomController())->join($request);
-    }
-    if ($type === 'leave_room') {
-        return (new RoomController())->leave($request);
-    }
-    if ($type === 'start_early') {
-        return (new RoomController())->startEarly($request);
-    }
-    if ($type === 'submit_event') {
-        return (new EventController())->store($request);
-    }
 
-    throw ValidationException::withMessages([
-        "Unexpected request type: $type",
-    ]);
+    // FIXME: This is not the proper way to enforce middleware.
+    // Using different routes will resolve this problem.
+    return app(AuthenticateAPI::class)->handle($request, function (Request $request) use ($type) {
+        if ($type === 'new_room') {
+            return (new RoomController())->store($request);
+        }
+        if ($type === 'join_room') {
+            return (new RoomController())->join($request);
+        }
+        if ($type === 'leave_room') {
+            return (new RoomController())->leave($request);
+        }
+        if ($type === 'start_early') {
+            return (new RoomController())->startEarly($request);
+        }
+        if ($type === 'submit_event') {
+            return (new EventController())->store($request);
+        }
+        if ($type === 'get_events') {
+            return (new EventController())->index($request);
+        }
+
+        throw ValidationException::withMessages([
+            "Unexpected request type: $type",
+        ]);
+    });
 });
 
 // RESTful API for rooms

@@ -7,21 +7,17 @@ use App\Models\Room;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 class EventController extends Controller
 {
-
-    /**
-     * RoomController constructor.
-     */
-    public function __construct()
+    public function index(Request $request)
     {
-        parent::__construct();
-
-        // Enforce API authentication for each request.
-        $this->middleware('auth.api');
+        \Validator::make($request->all(), [
+            'room_id' => 'required|int',
+            'filter' => 'required|string', // Possible values: 'time', 'tick' but maybe others?
+            'filter_arg' => 'required|string',
+        ])->validate();
     }
 
     /**
@@ -31,7 +27,11 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validator($request)->validate();
+        \Validator::make($request->all(), [
+            'room_id' => 'required|int',
+            'event_msg' => 'required|string',
+            'occurs_at' => 'required|string',
+        ])->validate();
 
         json_decode($request->input('event_msg'));
         if (json_last_error() !== JSON_ERROR_NONE) {
@@ -61,14 +61,6 @@ class EventController extends Controller
         return response([
             'success' => true,
             'room_id' => $room->id,
-        ]);
-    }
-
-    public function validator(Request $request) {
-        return Validator::make($request->all(), [
-            'room_id' => 'required|int',
-            'event_msg' => 'required|str',
-            'occurs_at' => 'required|str',
         ]);
     }
 
