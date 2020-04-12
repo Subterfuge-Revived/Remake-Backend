@@ -24,7 +24,7 @@ class BlockController extends Controller
             'other_player_id' => 'required|int',
         ])->validate();
 
-        if (!$otherPlayer = Player::whereId('other_player_id')->first()) {
+        if (!$otherPlayer = Player::whereId($request->input('other_player_id'))->first()) {
             throw ValidationException::withMessages(['Player does not exist']);
         }
         if ($otherPlayer == $this->session->player) {
@@ -44,8 +44,42 @@ class BlockController extends Controller
         return response('', 201);
     }
 
+    /**
+     * Unblock another player.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws \Exception
+     */
     public function delete(Request $request)
     {
+        \Validator::make($request->all(), [
+            'other_player_id' => 'required|int',
+        ])->validate();
 
+        if (!$block = Block
+            ::where('sender_player_id', '=', $this->session->player_id)
+            ->where('recipient_player_id', '=', $request->input('other_player_id'))
+            ->first()
+        ) {
+            // No such block found
+            return response('', 404);
+        }
+
+        $block->delete();
+
+        return response('', 204);
+    }
+
+    /**
+     * Get the list of blocked players.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     */
+    public function index(Request $request)
+    {
+        $blocks = Block::whereSenderPlayerId($this->session->player_id)->get();
+        return response($blocks);
     }
 }

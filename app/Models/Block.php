@@ -40,6 +40,11 @@ class Block extends Model
         'recipient_player_id',
     ];
 
+    protected $visible = [
+        'sender_player_id',
+        'recipient_player_id',
+    ];
+
     /**
      * @return BelongsTo
      */

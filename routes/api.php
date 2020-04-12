@@ -70,6 +70,12 @@ Route::post('/', function (Request $request) {
         if ($type === 'block') {
             return (new BlockController())->store($request);
         }
+        if ($type === 'unblock') {
+            return (new BlockController())->delete($request);
+        }
+        if ($type === 'get_blocks') {
+            return (new BlockController())->index($request);
+        }
 
         throw ValidationException::withMessages([
             "Unexpected request type: $type",
