@@ -47,4 +47,12 @@ class Block extends Model
     {
         return $this->belongsTo(Player::class, 'sender_player_id');
     }
+
+    /**
+     * @return BelongsTo
+     */
+    public function blocked_player()
+    {
+        return $this->belongsTo(Player::class, 'recipient_player_id');
+    }
 }
