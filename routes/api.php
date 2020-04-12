@@ -53,6 +53,9 @@ Route::post('/', function (Request $request) {
         if ($type === 'get_events') {
             return (new EventController())->index($request);
         }
+        if ($type === 'delete_events') {
+            return (new EventController())->delete($request);
+        }
 
         throw ValidationException::withMessages([
             "Unexpected request type: $type",

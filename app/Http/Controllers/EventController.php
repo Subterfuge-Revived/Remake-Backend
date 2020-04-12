@@ -105,4 +105,42 @@ class EventController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @return ResponseFactory|Response
+     * @throws ValidationException|\Exception
+     */
+    public function delete(Request $request)
+    {
+        \Validator::make($request->all(), [
+            'room_id' => 'required|int',
+            'event_id' => 'required|int',
+        ]);
+
+        if (!$room = Room::whereId('room_id')->first()) {
+            throw ValidationException::withMessages(['Room does not exist']);
+        }
+        if (!$room->players->contains($this->session->player)) {
+            throw ValidationException::withMessages(['Player is not in the room']);
+        }
+        if (!$room->hasStarted() or $room->hasEnded()) {
+            throw ValidationException::withMessages(['Room is not ongoing']);
+        }
+
+        /** @var Event $event */
+        if (!$event = $room->events->where('id', $request->input('event_id'))->first()) {
+            throw ValidationException::withMessages(['Event does not exist or does not belong to the room']);
+        }
+        if (!$event->player != $this->session->player) {
+            throw ValidationException::withMessages(['Event does not belong to the given player']);
+        }
+
+        $event->delete();
+
+        return response([
+            'success' => true,
+            'room' => $room->id,
+        ]);
+    }
+
 }
