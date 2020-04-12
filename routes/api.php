@@ -56,6 +56,9 @@ Route::post('/', function (Request $request) {
         if ($type === 'cancel_event') {
             return (new EventController())->delete($request);
         }
+        if ($type === 'get_room_data') {
+            return (new RoomController())->index($request);
+        }
 
         throw ValidationException::withMessages([
             "Unexpected request type: $type",

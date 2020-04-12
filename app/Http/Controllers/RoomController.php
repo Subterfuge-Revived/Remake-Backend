@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Player;
 use App\Models\PlayerRoom;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 
 class RoomController extends Controller
@@ -162,6 +165,50 @@ class RoomController extends Controller
         $room->delete();
 
         return response('')->setStatusCode(204);
+    }
+
+    /**
+     * Get a collection of relevant rooms.
+     *
+     * @param Request $request
+     * @return ResponseFactory|Response
+     */
+    public function index(Request $request)
+    {
+        // TODO: Is it OK to filter out closed rooms? If not, then without filters we could fetch
+        // ALL rooms from the database!
+        $rooms = Room::query()->whereNull('closed_at');
+        if ($request->input('filter_by_player') === 'true' || $request->input('room_status') === 'ongoing') {
+
+            // Get only the rooms that have the current player registered to it
+            $rooms->whereHas('players', function (Builder $query) {
+                $query->where('player_id', '=', $this->session->player_id);
+            });
+        }
+
+        $rooms = $rooms->get()->map(function (Room $room) {
+            return [
+                'room_id' => $room->id,
+                'status' => $room->hasStarted() ? 'ongoing' : 'open',
+                'creator_id' => $room->creator_player_id,
+                'rated' => $room->is_rated,
+                'min_rating' => $room->min_rating,
+                'description' => $room->description,
+                'goal' => $room->goal_id,
+                'anonymity' => $room->is_anonymous,
+                'map' => $room->map,
+                'seed' => $room->seed,
+                'started_at' => $room->started_at->unix(),
+                'max_players' => $room->max_players,
+                'players' => $room->is_anonymous
+                    ? $room->players->map(function (Player $player) {
+                        return ['name' => 'Anonymous', 'id' => $player->id];})
+                    : $room->players->map(function (Player $player) {
+                        return ['name' => $player->name, 'id' => $player->id];})
+            ];
+        });
+
+        return response($rooms);
     }
 
     /**
