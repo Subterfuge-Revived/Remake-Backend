@@ -37,11 +37,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Message extends Model
 {
-    protected $casts = [
-        'sender_player_id' => 'int',
-        'message_group_id' => 'int',
-    ];
-
     protected $fillable = [
         'sender_player_id',
         'message_group_id',
