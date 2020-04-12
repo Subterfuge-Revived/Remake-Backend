@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\MessageGroupController;
 use App\Http\Controllers\RoomController;
 use App\Http\Middleware\AuthenticateAPI;
 use Illuminate\Http\Request;
@@ -60,6 +61,9 @@ Route::post('/', function (Request $request) {
         }
         if ($type === 'get_room_data') {
             return (new RoomController())->index($request);
+        }
+        if ($type === 'create_group') {
+            return (new MessageGroupController())->store($request);
         }
         if ($type === 'message') {
             return (new MessageController())->store($request);
