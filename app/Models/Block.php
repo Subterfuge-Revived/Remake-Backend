@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $updated_at
  * @property int $sender_player_id
  * @property int $recipient_player_id
+ * @property-read Player $blocked_player
  * @property Player $player
  * @package App\Models
  * @method static Builder|Block newModelQuery()

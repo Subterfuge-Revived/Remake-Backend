@@ -43,6 +43,12 @@ class MessageGroup extends Model
 		'room_id'
 	];
 
+	protected $visible = [
+	    'id',
+	    'room_id',
+        'message_group_members',
+    ];
+
     /**
      * @return BelongsTo
      */

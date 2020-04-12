@@ -61,6 +61,7 @@ use Str;
  * @property-read int|null $created_rooms_count
  * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
+ * @property-read int|null $blocked_players_count
  */
 class Player extends Authenticatable
 {

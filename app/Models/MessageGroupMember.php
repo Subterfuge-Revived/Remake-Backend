@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property int $message_group_id
+ * @property int|null $player_id
  * @property MessageGroup $message_group
  * @package App\Models
  * @method static Builder|MessageGroupMember newModelQuery()
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static Builder|MessageGroupMember whereMessageGroupId($value)
  * @method static Builder|MessageGroupMember whereUpdatedAt($value)
  * @mixin Eloquent
+ * @method static Builder|MessageGroupMember wherePlayerId($value)
  */
 class MessageGroupMember extends Model
 {
@@ -44,4 +46,12 @@ class MessageGroupMember extends Model
 	{
 		return $this->belongsTo(MessageGroup::class);
 	}
+
+    /**
+     * @return BelongsTo
+     */
+	public function player()
+    {
+        return $this->belongsTo(Player::class);
+    }
 }
