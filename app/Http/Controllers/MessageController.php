@@ -24,7 +24,7 @@ class MessageController extends Controller
     {
         \Validator::make($request->all(), [
             'message' => 'required|string',
-            'group_id' => 'required|int',   // TODO: Implement a call that returns chat groups
+            'group_id' => 'required|int',
         ])->validate();
 
         $profanityCheck = new ProfanityCheck();

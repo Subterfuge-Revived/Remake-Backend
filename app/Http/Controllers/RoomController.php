@@ -7,7 +7,6 @@ use App\Models\PlayerRoom;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +18,7 @@ class RoomController extends Controller
 
     /**
      * @param Request $request
-     * @return Validator
+     * @return \Validator
      */
     public function validator(Request $request)
     {
@@ -42,8 +41,6 @@ class RoomController extends Controller
      */
     public function show(int $roomId)
     {
-        // TODO: Determine whether a user must be authenticated to use this API.
-
         if (!$room = Room::whereId($roomId)->first()) {
             return response('')->setStatusCode(404);
         }
