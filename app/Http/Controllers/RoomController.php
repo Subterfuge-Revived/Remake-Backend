@@ -186,8 +186,8 @@ class RoomController extends Controller
             ? $request->get('min_rating')
             : 0;
 
+        $room->goal()->associate(Goal::whereIdentifier($request->get('goal'))->first());
         $room->update([
-            'goal_id' => $request->get('goal'),
             'description' => $request->get('description'),
             'is_rated' => $request->get('rated'),
             'is_anonymous' => $request->get('anonymity'),
