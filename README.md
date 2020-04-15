@@ -43,5 +43,8 @@ Step 10: Run the migrations.
 ```shell script
 php artisan migrate
 ```
-
+Step 11: Run the seeds.
+```shell script
+php artisan db:seed
+```
 Once completed, you can send requests to `http://192.168.99.100/api`.
