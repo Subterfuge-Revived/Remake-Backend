@@ -9,10 +9,8 @@ use App\Models\Player;
 use App\Models\PlayerRoom;
 use App\Models\Room;
 use Carbon\Carbon;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -41,7 +39,7 @@ class RoomController extends Controller
      * Get a collection of relevant rooms.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -91,7 +89,7 @@ class RoomController extends Controller
      * Create a new room.
      *
      * @param Request $request
-     * @return JsonResponse|Response
+     * @return Response
      * @throws ValidationException
      */
     public function store(Request $request)
@@ -147,7 +145,7 @@ class RoomController extends Controller
      * Show a room.
      *
      * @param int $roomId
-     * @return ResponseFactory|Response|object
+     * @return Response
      */
     public function show(int $roomId)
     {
@@ -163,7 +161,7 @@ class RoomController extends Controller
      *
      * @param $roomId
      * @param Request $request
-     * @return ResponseFactory|Response|object
+     * @return Response
      * @throws ValidationException
      */
     public function update($roomId, Request $request)
@@ -222,7 +220,7 @@ class RoomController extends Controller
      * Join a room.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function join(Request $request)
@@ -258,7 +256,7 @@ class RoomController extends Controller
      * Leave a room.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException|\Exception
      */
     public function leave(Request $request)
@@ -295,7 +293,7 @@ class RoomController extends Controller
      * Start a room early.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function startEarly(Request $request)

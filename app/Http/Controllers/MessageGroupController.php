@@ -7,7 +7,6 @@ use App\Models\MessageGroup;
 use App\Models\MessageGroupMember;
 use App\Models\Player;
 use App\Models\Room;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
@@ -19,7 +18,7 @@ class MessageGroupController extends Controller
      * Create a new message group.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function store(Request $request)

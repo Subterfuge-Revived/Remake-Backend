@@ -8,7 +8,6 @@ use App\Http\Responses\UpdatedResponse;
 use App\Models\Event;
 use App\Models\Room;
 use App\Http\Responses\CreatedResponse;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -19,7 +18,7 @@ class EventController extends Controller
      * Show a list of events.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function index(Request $request)
@@ -64,7 +63,7 @@ class EventController extends Controller
      * Create an event.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function store(Request $request)
@@ -107,7 +106,7 @@ class EventController extends Controller
      * Delete an event.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException|\Exception
      */
     public function delete(Request $request)
@@ -127,7 +126,7 @@ class EventController extends Controller
      * Update an event.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function update(Request $request)

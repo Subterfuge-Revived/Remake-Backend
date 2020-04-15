@@ -7,7 +7,6 @@ use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\NotFoundResponse;
 use App\Models\Block;
 use App\Models\Player;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -18,7 +17,7 @@ class BlockController extends Controller
      * Block another player.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function store(Request $request)
@@ -51,7 +50,7 @@ class BlockController extends Controller
      * Unblock another player.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws \Exception
      */
     public function delete(Request $request)
@@ -78,7 +77,7 @@ class BlockController extends Controller
      * Get the list of blocked players.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      */
     public function index(Request $request)
     {

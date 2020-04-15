@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Http\Responses\CreatedResponse;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -54,7 +53,7 @@ class MessageController extends Controller
      * Get the messages from the given chat group.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return Response
      * @throws ValidationException
      */
     public function index(Request $request)
