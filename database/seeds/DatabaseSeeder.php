@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Be the first to obtain 15 outposts',
             ],
         ])->each(function ($goal) {
-            (new Goal($goal))->save();
+            Goal::updateOrCreate($goal);
         });
     }
 }
