@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\DeletedResponse;
+use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\UpdatedResponse;
 use App\Models\Event;
 use App\Models\Room;
 use App\Http\Responses\CreatedResponse;
@@ -13,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 class EventController extends Controller
 {
     /**
-     * Show an event.
+     * Show a list of events.
      *
      * @param Request $request
      * @return ResponseFactory|Response
@@ -28,7 +31,7 @@ class EventController extends Controller
         ])->validate();
 
         if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return response('', 404);
+            return new NotFoundResponse();
         }
 
         if (!$room->players->contains($this->session->player)) {
@@ -46,7 +49,7 @@ class EventController extends Controller
 
         $events = $eventsQuery->get();
 
-        return response($events->map(function (Event $event) {
+        return new Response($events->map(function (Event $event) {
             return [
                 'event_id' => $event->id,
                 'time_issued' => $event->created_at->unix(),
@@ -78,7 +81,7 @@ class EventController extends Controller
         }
 
         if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return response('', 404);
+            return new NotFoundResponse();
         }
 
         if (!$room->players->contains($this->session->player)) {
@@ -117,7 +120,7 @@ class EventController extends Controller
         $event = $this->getEvent($request);
         $event->delete();
 
-        return response('', 204);
+        return new DeletedResponse($event);
     }
 
     /**
@@ -139,7 +142,7 @@ class EventController extends Controller
         $event->event_json = json_decode($request->input('event_msg'));
         $event->save();
 
-        return response('', 204);
+        return new UpdatedResponse($event);
     }
 
     /**

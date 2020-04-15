@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\CreatedResponse;
+use App\Http\Responses\DeletedResponse;
+use App\Http\Responses\NotFoundResponse;
 use App\Models\Block;
 use App\Models\Player;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -41,7 +44,7 @@ class BlockController extends Controller
         $block->save();
 
         // Return Created
-        return response('', 201);
+        return new CreatedResponse($block);
     }
 
     /**
@@ -63,12 +66,12 @@ class BlockController extends Controller
             ->first()
         ) {
             // No such block found
-            return response('', 404);
+            return new NotFoundResponse();
         }
 
         $block->delete();
 
-        return response('', 204);
+        return new DeletedResponse($block);
     }
 
     /**
@@ -80,6 +83,6 @@ class BlockController extends Controller
     public function index(Request $request)
     {
         $blocks = Block::whereSenderPlayerId($this->session->player_id)->get();
-        return response($blocks);
+        return new Response($blocks);
     }
 }

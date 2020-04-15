@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Responses\UnauthorizedResponse;
 use App\Models\PlayerSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class AuthenticateAPI extends Authenticate
         $session = PlayerSession::findByToken($request->input('session_id') ?? '');
 
         if (!$session || !$session->isValid()) {
-            return response('')->setStatusCode(401);
+            return new UnauthorizedResponse();
         }
 
         return $next($request);

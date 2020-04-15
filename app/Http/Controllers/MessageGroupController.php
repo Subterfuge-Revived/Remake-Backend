@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\CreatedResponse;
 use App\Models\MessageGroup;
 use App\Models\MessageGroupMember;
 use App\Models\Player;
@@ -11,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use mofodojodino\ProfanityFilter\Check as ProfanityCheck;
 
 class MessageGroupController extends Controller
 {
@@ -65,6 +65,6 @@ class MessageGroupController extends Controller
 
         $messageGroup->message_group_members()->saveMany($members);
 
-        return response('', 201);
+        return new CreatedResponse($messageGroup);
     }
 }

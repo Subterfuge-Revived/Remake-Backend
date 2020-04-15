@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\DeletedResponse;
+use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\UnauthorizedResponse;
 use App\Models\Player;
 use App\Models\PlayerRoom;
 use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,7 +22,7 @@ class RoomController extends Controller
 
     /**
      * @param Request $request
-     * @return \Validator
+     * @return Validator
      */
     public function validator(Request $request)
     {
@@ -42,10 +46,10 @@ class RoomController extends Controller
     public function show(int $roomId)
     {
         if (!$room = Room::whereId($roomId)->first()) {
-            return response('')->setStatusCode(404);
+            return new NotFoundResponse();
         }
 
-        return response($room);
+        return new Response($room);
     }
 
     /**
@@ -85,7 +89,7 @@ class RoomController extends Controller
         $playerRoom->player()->associate($this->session->player);
         $playerRoom->room()->associate($room);
 
-        return response([
+        return new Response([
             'success' => true,
             'created_room' => [
                 'room_id' => $room->id,
@@ -115,7 +119,7 @@ class RoomController extends Controller
     {
         $this->validator($request)->validate();
         if (!$room = Room::whereId($roomId)->first()) {
-            return response('')->setStatusCode(404);
+            return new NotFoundResponse();
         }
 
         if ($room->hasStarted()) {
@@ -137,30 +141,30 @@ class RoomController extends Controller
             'seed' => Carbon::now()->unix(),
         ]);
 
-        return response($room);
+        return new Response($room);
     }
 
     /**
      * Destroy a room.
      *
      * @param $roomId
-     * @return ResponseFactory|Response|object
+     * @return Response
      * @throws \Exception
      */
     public function destroy($roomId)
     {
         if (!$room = Room::whereId($roomId)->first()) {
-            return response('')->setStatusCode(404);
+            return new NotFoundResponse();
         }
 
         // Only the creator of a room can destroy it. Return unauthorized otherwise.
         if ($room->creator_player != $this->session->player) {
-            return response('')->setStatusCode(401);
+            return new UnauthorizedResponse();
         }
 
         $room->delete();
 
-        return response('')->setStatusCode(204);
+        return new DeletedResponse($room);
     }
 
     /**
@@ -209,7 +213,7 @@ class RoomController extends Controller
             ];
         });
 
-        return response($rooms);
+        return new Response($rooms);
     }
 
     /**
@@ -222,7 +226,7 @@ class RoomController extends Controller
     public function join(Request $request)
     {
         if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return response('', 404);
+            return new NotFoundResponse();
         }
 
         if ($this->session->player->rating < $room->min_rating) {
@@ -243,10 +247,9 @@ class RoomController extends Controller
 
         $room->players()->save($this->session->player);
 
-        return response([
-            'success' => true,
-            'room' => $room->id,
-        ]);
+        // Since we have indirectly updated the room resource,
+        // it makes sense to return it.
+        return new Response($room->with('players'));
     }
 
     /**
@@ -259,7 +262,7 @@ class RoomController extends Controller
     public function leave(Request $request)
     {
         if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return response('', 404);
+            return new NotFoundResponse();
         }
 
         if (!$room->players->contains($this->session->player)) {
@@ -281,15 +284,13 @@ class RoomController extends Controller
             $room->delete();
         }
 
-        return response([
-            'success' => true,
-            'room' => $room->id, // FIXME: The room may have been deleted! Why are we returning its id?
-        ]);
+        // Since we have indirectly updated the room resource,
+        // it makes sense to return it.
+        return new Response($room->with('players'));
     }
 
     /**
      * Start a room early.
-     * TODO: This method is called "start early" but we should call a "start" function instead.
      *
      * @param Request $request
      * @return ResponseFactory|Response
@@ -298,11 +299,11 @@ class RoomController extends Controller
     public function startEarly(Request $request)
     {
         if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return response('', 404);
+            return new NotFoundResponse();
         }
 
         if ($room->creator_player != $this->session->player) {
-            return response('', 401);
+            return new UnauthorizedResponse();
         }
 
         if ($room->hasStarted()) {
@@ -316,9 +317,6 @@ class RoomController extends Controller
         $room->started_at = Carbon::now();
         $room->save();
 
-        return response([
-            'success' => true,
-            'room' => $room->id,
-        ]);
+        return new Response($room);
     }
 }

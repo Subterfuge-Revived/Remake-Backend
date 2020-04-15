@@ -60,8 +60,7 @@ class LoginController extends Controller
         ])) {
             $player = Player::whereName($request->get('username'))->first();
             $token = $player->new_token();
-            return response([
-                'success' => true,
+            return Response([
                 'user' => [
                     'id' => $player->id,
                     'name' => $player->name,

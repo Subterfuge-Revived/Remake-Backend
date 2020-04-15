@@ -71,8 +71,7 @@ class RegisterController extends Controller
 
         $this->guard()->login($player);
 
-        return response([
-            'success' => true,
+        return new Response([
             'player' => [
                 'id' => $player->id,
                 'name' => $player->name,
