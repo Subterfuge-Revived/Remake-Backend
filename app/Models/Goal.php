@@ -37,4 +37,10 @@ class Goal extends Model
         'identifier',
         'description',
     ];
+
+    protected $visible = [
+        'id',
+        'identifier',
+        'description',
+    ];
 }
