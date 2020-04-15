@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property bool $is_anonymous
  * @property int $map
  * @property int $seed
+ * @property Goal $goal
  * @property Player $player
  * @property Collection|Event[] $events
  * @property Collection|MessageGroup[] $message_groups
@@ -126,6 +127,12 @@ class Room extends Model
             ->withTimestamps();
     }
 
+    /**
+     * @return BelongsTo
+     */
+    public function goal() {
+        return $this->belongsTo(Goal::class);
+    }
     /**
      * Whether the game has started.
      *

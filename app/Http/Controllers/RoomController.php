@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\NotFoundResponse;
 use App\Http\Responses\UnauthorizedResponse;
+use App\Models\Goal;
 use App\Models\Player;
 use App\Models\PlayerRoom;
 use App\Models\Room;
@@ -13,6 +14,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class RoomController extends Controller
@@ -26,7 +28,7 @@ class RoomController extends Controller
     {
         return \Validator::make($request->all(), [
             'max_players' => 'required|int|between:2,10',
-            'goal' => 'required|int', // FIXME: We should not require the client to send goal IDs but rather identifiers
+            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
             'description' => 'required|string',
             'map' => 'required|int|between:0,3',
             'min_rating' => 'required|int|min:0', // TODO: Make this optional for open games?
@@ -110,8 +112,7 @@ class RoomController extends Controller
 
         // Create the room and associate it with its creator
         /** @var Room $room */
-        $room = $this->session->player->created_rooms()->save(new Room([
-            'goal_id' => $request->get('goal'),
+        $room = new Room([
             'description' => $request->get('description'),
             'is_rated' => $request->get('rated'),
             'is_anonymous' => $request->get('anonymity'),
@@ -119,7 +120,9 @@ class RoomController extends Controller
             'min_rating' => $minRating,
             'map' => $request->get('map'),
             'seed' => Carbon::now()->unix(),
-        ]));
+        ]);
+        $room->goal()->associate(Goal::whereIdentifier($request->get('goal'))->first());
+        $this->session->player->created_rooms()->save($room);
 
         // Add the creator to the room
         $playerRoom = new PlayerRoom();
@@ -137,7 +140,7 @@ class RoomController extends Controller
                 'max_players' => $room->max_players,
                 'player_count' => 1, // TODO: This is always only the creator, do we really need to return this?
                 'min_rating' => $room->min_rating,
-                'goal' => $room->goal_id,
+                'goal' => $room->goal->identifier,
                 'anonymity' => (bool)$room->is_anonymous,
                 'map' => $room->map,
                 'seed' => $room->seed,

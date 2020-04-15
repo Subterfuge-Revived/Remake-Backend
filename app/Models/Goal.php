@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Goal
@@ -43,4 +44,11 @@ class Goal extends Model
         'identifier',
         'description',
     ];
+
+    /**
+     * @return HasMany
+     */
+    public function rooms() {
+        return $this->hasMany(Room::class);
+    }
 }
