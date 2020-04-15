@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\BlockController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\GoalController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\MessageGroupController;
 use App\Http\Controllers\RoomController;
@@ -79,6 +80,9 @@ Route::post('/', function (Request $request) {
         }
         if ($type === 'get_blocks') {
             return (new BlockController())->index($request);
+        }
+        if ($type === 'get_goals') {
+            return (new GoalController())->index($request);
         }
 
         throw ValidationException::withMessages([
