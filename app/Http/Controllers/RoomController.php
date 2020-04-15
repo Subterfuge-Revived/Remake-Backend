@@ -72,7 +72,7 @@ class RoomController extends Controller
                 'anonymity' => $room->is_anonymous,
                 'map' => $room->map,
                 'seed' => $room->seed,
-                'started_at' => $room->started_at->unix(),
+                'started_at' => $room->hasStarted() ? $room->started_at->unix() : null,
                 'max_players' => $room->max_players,
                 'players' => $room->is_anonymous
                     ? $room->players->map(function (Player $player) {
@@ -128,6 +128,7 @@ class RoomController extends Controller
         $playerRoom = new PlayerRoom();
         $playerRoom->player()->associate($this->session->player);
         $playerRoom->room()->associate($room);
+		$playerRoom->save();
 
         // TODO: In style with the other APIs we should return an empty 201 response
         // with a Location header to the room.
@@ -264,7 +265,7 @@ class RoomController extends Controller
 
         // Since we have indirectly updated the room resource,
         // it makes sense to return it.
-        return new Response($room->with('players'));
+        return new Response($room->load('players'));
     }
 
     /**
@@ -295,7 +296,7 @@ class RoomController extends Controller
 
         // Since we have indirectly updated the room resource,
         // it makes sense to return it.
-        return new Response($room->with('players'));
+        return new Response($room->load('players'));
     }
 
     /**
