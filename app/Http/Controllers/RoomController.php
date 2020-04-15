@@ -43,9 +43,13 @@ class RoomController extends Controller
      */
     public function index(Request $request)
     {
-        // TODO: Is it OK to filter out closed rooms? If not, then without filters we could fetch
-        // ALL rooms from the database!
-        $rooms = Room::query()->whereNull('closed_at');
+        $rooms = Room::query();
+
+        if ($request->input('return_closed_rooms') !== 'true') {
+            // Unless specifically requested to return closed rooms, filter them
+            $rooms = $rooms->whereNull('closed_at');
+        }
+
         if ($request->input('filter_by_player') === 'true' || $request->input('room_status') === 'ongoing') {
 
             // Get only the rooms that have the current player registered to it
