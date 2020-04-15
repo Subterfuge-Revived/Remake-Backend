@@ -35,12 +35,6 @@ class EventController extends Controller
             throw ValidationException::withMessages(['Player is not in the room']);
         }
 
-        // TODO: Should we validate on this? The amount of events in a non-started room is zero,
-        // and it seems perfectly fine to return an empty list of events.
-        if (!$room->hasStarted()) {
-            throw ValidationException::withMessages(['Room has not started yet']);
-        }
-
         // TODO: We should change this API to accept multiple filters
         $eventsQuery = $room->events();
         if ($request->input('filter') === 'time') {
@@ -52,7 +46,6 @@ class EventController extends Controller
 
         $events = $eventsQuery->get();
 
-        // TODO: We do not return "success: true" in this response, unlike other API calls
         return response($events->map(function (Event $event) {
             return [
                 'event_id' => $event->id,
