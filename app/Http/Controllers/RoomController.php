@@ -276,15 +276,16 @@ class RoomController extends Controller
             throw ValidationException::withMessages(['Player is not in the room']);
         }
 
-        // TODO: Should we allow a player to leave a room even after the game has started?
-        // As long as we retain messages and events, it should not cause any problems.
-        // This would be an effective way of resigning the game since a re-join will be impossible.
-        // However, it also refuses the resigned player access to spectate the game.
         if ($room->hasStarted()) {
             throw ValidationException::withMessages(['Cannot leave a room after it has started']);
         }
 
         $room->players()->where('id', $this->session->player->id)->detach();
+
+        // TODO: Ideally we should have a table of resignations (or better: game outcomes)
+        // over which we could sum. This way we have no way to be sure of data integrity over time.
+        $this->session->player->resignations += 1;
+        $this->session->player->save();
 
         $room->refresh();
         if ($room->players->isEmpty()) {
