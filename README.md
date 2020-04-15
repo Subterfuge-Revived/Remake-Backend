@@ -32,14 +32,19 @@ docker-compose exec app bash
 cd sandbox
 composer install
 ```
-Step 9: Exit the container (`exit`).
+
+Step 9: Set the application key for the Laravel installation:
+```shell script
+php artisan key:generate
+```
+You should see the environment variable `APP_KEY` gets filled in the `.env` file.
 
 Step 10: Run the migrations.
 ```shell script
-docker-compose exec db bash
-cat /data/migrations/*sql | mysql -u root -p
-[enter MySQL root paassword as specified in .env file]
+php artisan migrate
 ```
-
-Once completed, access `http://localhost` or `http://localhost/event_exec.php`.
-In the backend php files, the domain `db` will resolve to the `db` docker service, allowing database connections.
+Step 11: Run the seeds.
+```shell script
+php artisan db:seed
+```
+Once completed, you can send requests to `http://192.168.99.100/api`.
