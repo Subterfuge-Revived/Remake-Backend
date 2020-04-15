@@ -284,9 +284,6 @@ class RoomController extends Controller
         $this->session->player->save();
 
         $room->refresh();
-        if ($room->players->isEmpty()) {
-            $room->delete();
-        }
 
         // Since we have indirectly updated the room resource,
         // it makes sense to return it.
