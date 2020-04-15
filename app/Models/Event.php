@@ -1,11 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models;
 
+use App\Traits\SerializesTimestamps;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -39,6 +38,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Event extends Model
 {
+    use SerializesTimestamps;
+
     protected $casts = [
         'event_json' => 'json',
     ];

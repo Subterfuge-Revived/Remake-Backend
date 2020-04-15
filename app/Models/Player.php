@@ -1,11 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models;
 
+use App\Traits\SerializesTimestamps;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -65,8 +64,7 @@ use Str;
  */
 class Player extends Authenticatable
 {
-
-    use Notifiable;
+    use Notifiable, SerializesTimestamps;
 
     protected $dates = [
         'last_online_at',

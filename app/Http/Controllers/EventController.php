@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Room;
+use App\Http\Responses\CreatedResponse;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -103,10 +104,7 @@ class EventController extends Controller
         $event->room()->associate($room);
         $event->save();
 
-        return response([
-            'success' => true,
-            'room_id' => $room->id,
-        ]);
+        return new CreatedResponse($event);
     }
 
     /**
@@ -126,10 +124,7 @@ class EventController extends Controller
         $event = $this->getEvent($request);
         $event->delete();
 
-        return response([
-            'success' => true,
-            'room' => $event->room->id,
-        ]);
+        return response('', 204);
     }
 
     /**
@@ -151,10 +146,7 @@ class EventController extends Controller
         $event->event_json = json_decode($request->input('event_msg'));
         $event->save();
 
-        return response([
-            'success' => true,
-            'room' => $event->room->id,
-        ]);
+        return response('', 204);
     }
 
     /**

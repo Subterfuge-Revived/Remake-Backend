@@ -1,11 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models;
 
+use App\Traits\SerializesTimestamps;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,6 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class MessageGroup extends Model
 {
+    use SerializesTimestamps;
 
 	protected $fillable = [
 		'room_id'

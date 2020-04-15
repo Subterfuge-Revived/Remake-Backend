@@ -1,11 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models;
 
+use App\Traits\SerializesTimestamps;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,25 +34,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class PlayerRoom extends Model
 {
+    use SerializesTimestamps;
 
 	protected $fillable = [
-		'room_id',
-		'player_id'
-	];
+        'room_id',
+        'player_id',
+    ];
 
     /**
      * @return BelongsTo
      */
 	public function player()
-	{
-		return $this->belongsTo(Player::class);
-	}
+    {
+        return $this->belongsTo(Player::class);
+    }
 
     /**
      * @return BelongsTo
      */
 	public function room()
-	{
-		return $this->belongsTo(Room::class);
-	}
+    {
+        return $this->belongsTo(Room::class);
+    }
 }

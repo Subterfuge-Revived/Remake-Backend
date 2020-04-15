@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Message;
 use App\Models\MessageGroup;
+use App\Http\Responses\CreatedResponse;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -17,7 +18,7 @@ class MessageController extends Controller
      * Create a new message.
      *
      * @param Request $request
-     * @return ResponseFactory|Response
+     * @return CreatedResponse
      * @throws ValidationException
      */
     public function store(Request $request)
@@ -46,7 +47,7 @@ class MessageController extends Controller
         $group->messages()->save($message);
 
         // Return Created response
-        return response('', 201);
+        return new CreatedResponse($message);
     }
 
     /**
@@ -72,6 +73,6 @@ class MessageController extends Controller
 
         $messages = Message::whereMessageGroupId($request->input('group_id'))->get();
 
-        return response($messages);
+        return new Response($messages);
     }
 }

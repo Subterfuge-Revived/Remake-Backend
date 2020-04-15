@@ -1,11 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models;
 
+use App\Traits\SerializesTimestamps;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,6 +36,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Message extends Model
 {
+    use SerializesTimestamps;
+
     protected $fillable = [
         'sender_player_id',
         'message_group_id',
@@ -45,6 +46,7 @@ class Message extends Model
 
 
     protected $visible = [
+        'created_at',
         'sender_player_id',
         'message',
     ];

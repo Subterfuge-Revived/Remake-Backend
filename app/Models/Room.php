@@ -1,11 +1,10 @@
 <?php
 
-/**
- * Created by Reliese Model.
- */
+
 
 namespace App\Models;
 
+use App\Traits\SerializesTimestamps;
 use Carbon\Carbon;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -63,6 +62,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Room extends Model
 {
+    use SerializesTimestamps;
 
     protected $dates = [
         'started_at',
@@ -131,11 +131,13 @@ class Room extends Model
      *
      * @return bool
      */
-    public function hasStarted() {
+    public function hasStarted()
+    {
         return $this->started_at !== null;
     }
 
-    public function hasEnded() {
+    public function hasEnded()
+    {
         return $this->closed_at !== null;
     }
 }
