@@ -88,4 +88,4 @@ Route::post('/', function (Request $request) {
 });
 
 // RESTful API for rooms
-Route::resource('/rooms', 'RoomController');
+Route::resource('/rooms', 'RoomController')->except(['create', 'edit']);

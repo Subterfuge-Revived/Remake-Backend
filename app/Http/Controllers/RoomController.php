@@ -38,19 +38,54 @@ class RoomController extends Controller
     }
 
     /**
-     * Show a room.
+     * Get a collection of relevant rooms.
      *
-     * @param int $roomId
-     * @return ResponseFactory|Response|object
+     * @param Request $request
+     * @return ResponseFactory|Response
      */
-    public function show(int $roomId)
+    public function index(Request $request)
     {
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
+        // TODO: Is it OK to filter out closed rooms? If not, then without filters we could fetch
+        // ALL rooms from the database!
+        $rooms = Room::query()->whereNull('closed_at');
+        if ($request->input('filter_by_player') === 'true' || $request->input('room_status') === 'ongoing') {
+
+            // Get only the rooms that have the current player registered to it
+            $rooms->whereHas('players', function (Builder $query) {
+                $query->where('player_id', '=', $this->session->player_id);
+            });
         }
 
-        return new Response($room);
+        $rooms = $rooms->get()->map(function (Room $room) {
+            return [
+                'room_id' => $room->id,
+                'status' => $room->hasStarted() ? 'ongoing' : 'open',
+                'creator_id' => $room->creator_player_id,
+                'rated' => $room->is_rated,
+                'min_rating' => $room->min_rating,
+                'description' => $room->description,
+                'goal' => $room->goal_id,
+                'anonymity' => $room->is_anonymous,
+                'map' => $room->map,
+                'seed' => $room->seed,
+                'started_at' => $room->started_at->unix(),
+                'max_players' => $room->max_players,
+                'players' => $room->is_anonymous
+                    ? $room->players->map(function (Player $player) {
+                        return ['name' => 'Anonymous', 'id' => $player->id];
+                    })
+                    : $room->players->map(function (Player $player) {
+                        return ['name' => $player->name, 'id' => $player->id];
+                    }),
+                'message_groups' => $room->message_groups()->whereHas('message_group_members', function (Builder $query) {
+                    $query->where('player_id', '=', $this->session->player_id);
+                })->get(),
+            ];
+        });
+
+        return new Response($rooms);
     }
+
 
     /**
      * Create a new room.
@@ -105,6 +140,21 @@ class RoomController extends Controller
                 'seed' => $room->seed,
             ],
         ]);
+    }
+
+    /**
+     * Show a room.
+     *
+     * @param int $roomId
+     * @return ResponseFactory|Response|object
+     */
+    public function show(int $roomId)
+    {
+        if (!$room = Room::whereId($roomId)->first()) {
+            return new NotFoundResponse();
+        }
+
+        return new Response($room);
     }
 
     /**
@@ -165,55 +215,6 @@ class RoomController extends Controller
         $room->delete();
 
         return new DeletedResponse($room);
-    }
-
-    /**
-     * Get a collection of relevant rooms.
-     *
-     * @param Request $request
-     * @return ResponseFactory|Response
-     */
-    public function index(Request $request)
-    {
-        // TODO: Is it OK to filter out closed rooms? If not, then without filters we could fetch
-        // ALL rooms from the database!
-        $rooms = Room::query()->whereNull('closed_at');
-        if ($request->input('filter_by_player') === 'true' || $request->input('room_status') === 'ongoing') {
-
-            // Get only the rooms that have the current player registered to it
-            $rooms->whereHas('players', function (Builder $query) {
-                $query->where('player_id', '=', $this->session->player_id);
-            });
-        }
-
-        $rooms = $rooms->get()->map(function (Room $room) {
-            return [
-                'room_id' => $room->id,
-                'status' => $room->hasStarted() ? 'ongoing' : 'open',
-                'creator_id' => $room->creator_player_id,
-                'rated' => $room->is_rated,
-                'min_rating' => $room->min_rating,
-                'description' => $room->description,
-                'goal' => $room->goal_id,
-                'anonymity' => $room->is_anonymous,
-                'map' => $room->map,
-                'seed' => $room->seed,
-                'started_at' => $room->started_at->unix(),
-                'max_players' => $room->max_players,
-                'players' => $room->is_anonymous
-                    ? $room->players->map(function (Player $player) {
-                        return ['name' => 'Anonymous', 'id' => $player->id];
-                    })
-                    : $room->players->map(function (Player $player) {
-                        return ['name' => $player->name, 'id' => $player->id];
-                    }),
-                'message_groups' => $room->message_groups()->whereHas('message_group_members', function (Builder $query) {
-                    $query->where('player_id', '=', $this->session->player_id);
-                })->get(),
-            ];
-        });
-
-        return new Response($rooms);
     }
 
     /**
