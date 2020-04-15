@@ -254,6 +254,14 @@ class RoomController extends Controller
 
         $room->players()->save($this->session->player);
 
+        $room->refresh();
+
+        // If the room is full, start it
+        if ($room->players->count() === $room->max_players) {
+            $room->started_at = Carbon::now();
+            $room->save();
+        }
+
         // Since we have indirectly updated the room resource,
         // it makes sense to return it.
         return new Response($room->with('players'));
