@@ -276,10 +276,6 @@ class RoomController extends Controller
             throw ValidationException::withMessages(['Player is not in the room']);
         }
 
-        if ($room->hasStarted()) {
-            throw ValidationException::withMessages(['Cannot leave a room after it has started']);
-        }
-
         $room->players()->where('id', $this->session->player->id)->detach();
 
         // TODO: Ideally we should have a table of resignations (or better: game outcomes)
