@@ -124,8 +124,9 @@ class RoomController extends Controller
         $playerRoom->player()->associate($this->session->player);
         $playerRoom->room()->associate($room);
 
+        // TODO: In style with the other APIs we should return an empty 201 response
+        // with a Location header to the room.
         return new Response([
-            'success' => true,
             'created_room' => [
                 'room_id' => $room->id,
                 'creator' => $this->session->player->id,
