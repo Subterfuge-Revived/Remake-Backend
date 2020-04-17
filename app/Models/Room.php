@@ -143,8 +143,20 @@ class Room extends Model
         return $this->started_at !== null;
     }
 
+    /**
+     * Whether the game has ended.
+     * @return bool
+     */
     public function hasEnded()
     {
         return $this->closed_at !== null;
+    }
+
+    /**
+     * Whether the game is ongoing.
+     * @return bool
+     */
+    public function isOngoing() {
+        return $this->hasStarted() && !$this->hasEnded();
     }
 }
