@@ -183,6 +183,10 @@ class RoomController extends Controller
             throw ValidationException::withMessages(['Room has already started']);
         }
 
+        if ($room->players->count() > (int)$request->get('max_players')) {
+            throw ValidationException::withMessages(['Room has more players than given max player amount']);
+        }
+
         $minRating = $request->get('rated')
             ? $request->get('min_rating')
             : 0;
