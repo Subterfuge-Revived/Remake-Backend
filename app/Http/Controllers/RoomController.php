@@ -207,6 +207,7 @@ class RoomController extends Controller
 
     /**
      * Destroy a room.
+     * TODO: We should decide when a user should be able to delete a room precisely
      *
      * @param $roomId
      * @return Response
@@ -221,6 +222,11 @@ class RoomController extends Controller
         // Only the creator of a room can destroy it. Return unauthorized otherwise.
         if ($room->creator_player != $this->session->player) {
             return new UnauthorizedResponse();
+        }
+
+        // TODO: Perhaps an admin should be able to delete an ongoing room anyway
+        if ($room->hasStarted()) {
+            throw ValidationException::withMessages(['Cannot delete a room that has started']);
         }
 
         $room->delete();
