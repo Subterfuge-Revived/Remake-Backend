@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use mofodojodino\ProfanityFilter\Check as ProfanityCheck;
 
 class RoomController extends Controller
 {
@@ -110,6 +111,11 @@ class RoomController extends Controller
             throw ValidationException::withMessages(['Invalid minimum rating']);
         }
 
+        $profanityCheck = new ProfanityCheck();
+        if ($profanityCheck->hasProfanity($request->get('description'))) {
+            throw ValidationException::withMessages(['Description cannot contain profanity']);
+        }
+
         // Create the room and associate it with its creator
         /** @var Room $room */
         $room = new Room([
@@ -185,6 +191,11 @@ class RoomController extends Controller
 
         if ($room->players->count() > (int)$request->get('max_players')) {
             throw ValidationException::withMessages(['Room has more players than given max player amount']);
+        }
+
+        $profanityCheck = new ProfanityCheck();
+        if ($profanityCheck->hasProfanity($request->get('description'))) {
+            throw ValidationException::withMessages(['Description cannot contain profanity']);
         }
 
         $minRating = $request->get('rated')
