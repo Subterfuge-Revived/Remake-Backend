@@ -21,8 +21,8 @@ class CreateEventsTable extends Migration
             $table->unsignedBigInteger('player_id');
             $table->json('event_json');
 
-            $table->foreign('room_id')->references('id')->on('rooms');
-            $table->foreign('player_id')->references('id')->on('players');
+            $table->foreign('room_id')->references('id')->on('rooms')->cascadeOnDelete();
+            $table->foreign('player_id')->references('id')->on('players')->cascadeOnDelete();
         });
     }
 

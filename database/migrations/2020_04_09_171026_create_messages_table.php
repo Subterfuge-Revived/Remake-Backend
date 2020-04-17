@@ -20,8 +20,8 @@ class CreateMessagesTable extends Migration
             $table->unsignedBigInteger('message_group_id');
             $table->text('message');
 
-            $table->foreign('sender_player_id')->references('id')->on('players');
-            $table->foreign('message_group_id')->references('id')->on('message_groups');
+            $table->foreign('sender_player_id')->references('id')->on('players')->cascadeOnDelete();
+            $table->foreign('message_group_id')->references('id')->on('message_groups')->cascadeOnDelete();
         });
     }
 

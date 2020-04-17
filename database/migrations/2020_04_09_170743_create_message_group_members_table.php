@@ -19,8 +19,8 @@ class CreateMessageGroupMembersTable extends Migration
             $table->unsignedBigInteger('message_group_id');
             $table->unsignedBigInteger('player_id');
 
-            $table->foreign('message_group_id')->references('id')->on('message_groups');
-            $table->foreign('player_id')->references('id')->on('players');
+            $table->foreign('message_group_id')->references('id')->on('message_groups')->cascadeOnDelete();
+            $table->foreign('player_id')->references('id')->on('players')->cascadeOnDelete();
         });
     }
 

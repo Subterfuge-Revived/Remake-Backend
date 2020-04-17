@@ -19,8 +19,8 @@ class CreateBlocksTable extends Migration
             $table->unsignedBigInteger('sender_player_id');
             $table->unsignedBigInteger('recipient_player_id');
 
-            $table->foreign('sender_player_id')->references('id')->on('players');
-            $table->foreign('recipient_player_id')->references('id')->on('players');
+            $table->foreign('sender_player_id')->references('id')->on('players')->cascadeOnDelete();
+            $table->foreign('recipient_player_id')->references('id')->on('players')->cascadeOnDelete();
         });
     }
 

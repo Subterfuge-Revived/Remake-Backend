@@ -28,8 +28,8 @@ class CreateRoomsTable extends Migration
             $table->integer('map'); // What does this mean?
             $table->integer('seed');
 
-            $table->foreign('creator_player_id')->references('id')->on('players');
-            $table->foreign('goal_id')->references('id')->on('goals');
+            $table->foreign('creator_player_id')->references('id')->on('players')->cascadeOnDelete();
+            $table->foreign('goal_id')->references('id')->on('goals')->cascadeOnDelete();
 
         });
     }
