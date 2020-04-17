@@ -117,6 +117,11 @@ class EventController extends Controller
         ]);
 
         $event = $this->getEvent($request);
+
+        if (!$event->occurs_at->isFuture()) {
+            throw ValidationException::withMessages(['Event is not in the future']);
+        }
+
         $event->delete();
 
         return new DeletedResponse($event);
@@ -138,6 +143,10 @@ class EventController extends Controller
         ]);
 
         $event = $this->getEvent($request);
+        if (!$event->occurs_at->isFuture()) {
+            throw ValidationException::withMessages(['Event is not in the future']);
+        }
+
         $event->event_json = json_decode($request->input('event_msg'));
         $event->save();
 
