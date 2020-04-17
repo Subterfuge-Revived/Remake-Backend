@@ -37,6 +37,10 @@ class MessageGroupController extends Controller
             throw ValidationException::withMessages(['You are not part of this room']);
         }
 
+        if (collect($request->get('participants'))->diff($room->players->pluck('id'))->isNotEmpty()) {
+            throw ValidationException::withMessages(['Not all given participants are in the room']);
+        }
+
         // The participants are the creator and the other players that he invites
         $participants = Player::whereIn('id', $request->input('participants'))->get()->add($this->session->player);
 
