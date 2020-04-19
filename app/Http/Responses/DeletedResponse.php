@@ -15,12 +15,14 @@ class DeletedResponse extends Response
      * @param int $status
      * @param array $headers
      */
-    public function __construct(Model $model, $content = '', $status = null, array $headers = [])
+    public function __construct(Model $model, string $content = '', ?int $status = null, array $headers = [])
     {
-        parent::__construct($content, $status, $headers);
+        if (!$status) {
+            // If not explicitly specified, set the status code to 200 or 204,
+            // depending on whether we have a response body.
+            $status = empty($content) ? 204 : 200;
+        }
 
-        // If not explicitly specified, set the status code to 200 or 204,
-        // depending on whether we have a response body.
-        $this->setStatusCode($status ? $status : (empty($content) ? 204 : 200));
+        parent::__construct($content, $status, $headers);
     }
 }
