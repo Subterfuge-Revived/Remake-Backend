@@ -54,6 +54,11 @@ class LoginController extends Controller
     {
         $this->clearLoginAttempts($request);
 
+        $this->validate($request, [
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
         if (Auth::attempt([
             'name' => $request->get('username'),
             'password' => $request->get('password'),
