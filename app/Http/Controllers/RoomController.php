@@ -85,7 +85,7 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'max_players' => 'required|int|between:2,10',
             'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
             'description' => 'required|string',
@@ -152,7 +152,7 @@ class RoomController extends Controller
      */
     public function update(Room $room, Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'max_players' => 'required|int|between:2,10',
             'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
             'description' => 'required|string',
@@ -226,9 +226,9 @@ class RoomController extends Controller
      */
     public function join(Request $request)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
+        $request->validate(['room_id' => 'required|int']);
+
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if ($this->session->player->rating < $room->min_rating) {
             throw ValidationException::withMessages(['Insufficient rating']);
@@ -270,9 +270,9 @@ class RoomController extends Controller
      */
     public function leave(Request $request)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
+        $request->validate(['room_id' => 'required|int']);
+
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
@@ -301,9 +301,7 @@ class RoomController extends Controller
      */
     public function startEarly(Request $request)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if ($room->creator_player != $this->session->player) {
             return new UnauthorizedResponse();
