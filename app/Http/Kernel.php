@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\AddAcceptJsonHeader;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\AuthenticateAPI;
 use App\Http\Middleware\CheckForMaintenanceMode;
@@ -63,6 +64,7 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             SubstituteBindings::class,
+            AddAcceptJsonHeader::class,
         ],
     ];
 
