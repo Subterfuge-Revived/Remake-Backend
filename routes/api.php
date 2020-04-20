@@ -91,4 +91,5 @@ Route::post('/', function (Request $request) {
     });
 });
 
-Route::resource('rooms', 'RoomController');
+Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
+Route::resource('messages', 'MessageController')->except(['create', 'edit']);
