@@ -23,15 +23,13 @@ class EventController extends Controller
      */
     public function index(Request $request)
     {
-        \Validator::make($request->all(), [
+        $request->validate([
             'room_id' => 'required|int',
             'filter' => 'required|string', // Possible values: 'time', 'tick' but maybe others?
             'filter_arg' => 'required|string',
-        ])->validate();
+        ]);
 
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
@@ -68,26 +66,24 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        \Validator::make($request->all(), [
+        $request->validate([
             'room_id' => 'required|int',
             'event_msg' => 'required|string',
             'occurs_at' => 'required|string',
-        ])->validate();
+        ]);
 
         json_decode($request->input('event_msg'));
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw ValidationException::withMessages(['Invalid event message: not valid JSON']);
         }
 
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in room']);
         }
 
-        if (!$room->hasStarted() || $room->hasEnded()) {
+        if (!$room->isOngoing()) {
             throw ValidationException::withMessages(['Room is not ongoing']);
         }
 
@@ -111,7 +107,7 @@ class EventController extends Controller
      */
     public function delete(Request $request)
     {
-        \Validator::make($request->all(), [
+        $request->validate([
             'room_id' => 'required|int',
             'event_id' => 'required|int',
         ]);
@@ -136,7 +132,7 @@ class EventController extends Controller
      */
     public function update(Request $request)
     {
-        \Validator::make($request->all(), [
+        $request->validate([
             'room_id' => 'required|int',
             'event_id' => 'required|int',
             'event_msg' => 'required|string',
@@ -163,13 +159,12 @@ class EventController extends Controller
      */
     private function getEvent(Request $request)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            throw ValidationException::withMessages(['Room does not exist']);
-        }
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
+
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
         }
-        if (!$room->hasStarted() || $room->hasEnded()) {
+        if (!$room->isOngoing()) {
             throw ValidationException::withMessages(['Room is not ongoing']);
         }
 
