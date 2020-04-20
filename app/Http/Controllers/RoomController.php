@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\CreatedResponse;
 use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\NotFoundResponse;
 use App\Http\Responses\UnauthorizedResponse;
@@ -23,18 +24,11 @@ class RoomController extends Controller
 
     /**
      * @param Request $request
-     * @return Validator
+     * @return \Validator
      */
     public function validator(Request $request)
     {
         return \Validator::make($request->all(), [
-            'max_players' => 'required|int|between:2,10',
-            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
-            'description' => 'required|string',
-            'map' => 'required|int|between:0,3',
-            'min_rating' => 'required|int|min:0', // TODO: Make this optional for open games?
-            'rated' => 'required|boolean',
-            'anonymity' => 'required|boolean',
         ]);
     }
 
@@ -101,7 +95,15 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validator($request)->validate();
+        $this->validate($request, [
+            'max_players' => 'required|int|between:2,10',
+            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
+            'description' => 'required|string',
+            'map' => 'required|int|between:0,3',
+            'min_rating' => 'int|min:0', // TODO: Make this  for open games?
+            'rated' => 'required|boolean',
+            'anonymity' => 'required|boolean',
+        ]);
 
         $minRating = $request->get('rated')
             ? $request->get('min_rating')
@@ -136,37 +138,17 @@ class RoomController extends Controller
         $playerRoom->room()->associate($room);
 		$playerRoom->save();
 
-        // TODO: In style with the other APIs we should return an empty 201 response
-        // with a Location header to the room.
-        return new Response([
-            'created_room' => [
-                'room_id' => $room->id,
-                'creator' => $this->session->player->id,
-                'description' => $room->description,
-                'rated' => (bool)$room->is_rated,
-                'max_players' => $room->max_players,
-                'player_count' => 1, // TODO: This is always only the creator, do we really need to return this?
-                'min_rating' => $room->min_rating,
-                'goal' => $room->goal->identifier,
-                'anonymity' => (bool)$room->is_anonymous,
-                'map' => $room->map,
-                'seed' => $room->seed,
-            ],
-        ]);
+        return new CreatedResponse($room);
     }
 
     /**
      * Show a room.
      *
-     * @param int $roomId
+     * @param Room $room
      * @return Response
      */
-    public function show(int $roomId)
+    public function show(Room $room)
     {
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
-        }
-
         return new Response($room);
     }
 
