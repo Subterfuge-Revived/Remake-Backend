@@ -23,15 +23,13 @@ class MessageGroupController extends Controller
      */
     public function store(Request $request)
     {
-        \Validator::make($request->all(), [
+        $request->validate([
             'room_id' => 'required|int',
             'participants' => 'required|array',
             'participants.*' => 'required|int|' . Rule::in(Player::pluck('id')),
-        ])->validate();
+        ]);
 
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            throw ValidationException::withMessages(['Room does not exist']);
-        }
+        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['You are not part of this room']);
@@ -42,7 +40,8 @@ class MessageGroupController extends Controller
         }
 
         // The participants are the creator and the other players that he invites
-        $participants = Player::whereIn('id', $request->input('participants'))->get()->add($this->session->player);
+        $participants = Player::whereIn('id', $request->input('participants'))
+            ->get()->add($this->session->player);
 
         if ($this->session->player->blocked_players
             ->intersect($participants)
