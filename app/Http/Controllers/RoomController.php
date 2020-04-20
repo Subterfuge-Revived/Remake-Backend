@@ -23,16 +23,6 @@ class RoomController extends Controller
 {
 
     /**
-     * @param Request $request
-     * @return \Validator
-     */
-    public function validator(Request $request)
-    {
-        return \Validator::make($request->all(), [
-        ]);
-    }
-
-    /**
      * Get a collection of relevant rooms.
      *
      * @param Request $request
@@ -100,7 +90,7 @@ class RoomController extends Controller
             'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
             'description' => 'required|string',
             'map' => 'required|int|between:0,3',
-            'min_rating' => 'int|min:0', // TODO: Make this  for open games?
+            'min_rating' => 'required|int|min:0', // TODO: Make this  for open games?
             'rated' => 'required|boolean',
             'anonymity' => 'required|boolean',
         ]);
@@ -155,17 +145,22 @@ class RoomController extends Controller
     /**
      * Update a room.
      *
-     * @param $roomId
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function update($roomId, Request $request)
+    public function update(Room $room, Request $request)
     {
-        $this->validator($request)->validate();
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
-        }
+        $this->validate($request, [
+            'max_players' => 'required|int|between:2,10',
+            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
+            'description' => 'required|string',
+            'map' => 'required|int|between:0,3',
+            'min_rating' => 'required|int|min:0', // TODO: Make this  for open games?
+            'rated' => 'required|boolean',
+            'anonymity' => 'required|boolean',
+        ]);
 
         if ($room->hasStarted()) {
             throw ValidationException::withMessages(['Room has already started']);
@@ -181,18 +176,17 @@ class RoomController extends Controller
         }
 
         $minRating = $request->get('rated')
-            ? $request->get('min_rating')
+            ? (int)$request->get('min_rating')
             : 0;
 
         $room->goal()->associate(Goal::whereIdentifier($request->get('goal'))->first());
         $room->update([
             'description' => $request->get('description'),
-            'is_rated' => $request->get('rated'),
-            'is_anonymous' => $request->get('anonymity'),
-            'max_players' => $request->get('max_players'),
+            'is_rated' => (bool)$request->get('rated'),
+            'is_anonymous' => (bool)$request->get('anonymity'),
+            'max_players' => (int)$request->get('max_players'),
             'min_rating' => $minRating,
-            'map' => $request->get('map'),
-            'seed' => Carbon::now()->unix(),
+            'map' => (int)$request->get('map'),
         ]);
 
         return new Response($room);
