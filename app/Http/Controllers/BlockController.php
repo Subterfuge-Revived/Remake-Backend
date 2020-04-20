@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\CreatedResponse;
 use App\Http\Responses\DeletedResponse;
-use App\Http\Responses\NotFoundResponse;
 use App\Http\Responses\UnauthorizedResponse;
+use App\Http\Responses\UpdatedResponse;
 use App\Models\Block;
 use App\Models\Player;
 use Illuminate\Http\Request;
@@ -74,6 +74,36 @@ class BlockController extends Controller
         $block->delete();
 
         return new DeletedResponse($block);
+    }
+
+    /**
+     * Show a block.
+     *
+     * @param Block $block
+     * @return Response
+     */
+    public function show(Block $block)
+    {
+        return new Response($block);
+    }
+
+    /**
+     * It currently makes little to no sense to update a block.
+     * However, in the RESTful API we will allow a player to change
+     *
+     * @param Block $block
+     * @param Request $request
+     * @return UpdatedResponse
+     */
+    public function update(Block $block, Request $request)
+    {
+        $request->validate(['other_player_id' => 'required|int']);
+        $otherPlayer = Player::whereId($request->get('other_player_id'))->firstOrFail();
+
+        $block->blocked_player()->associate($otherPlayer);
+        $block->save();
+
+        return new UpdatedResponse($block);
     }
 
     /**
