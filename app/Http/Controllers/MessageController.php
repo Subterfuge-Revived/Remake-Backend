@@ -24,20 +24,14 @@ class MessageController extends Controller
      */
     public function index(Request $request)
     {
-        $this->validate($request, [
-            'group_id' => 'required|int',
-        ]);
-
-        if (!$group = MessageGroup::whereId($request->input('group_id'))->first()) {
-            throw ValidationException::withMessages(['Message group does not exist']);
-        }
+        $request->validate(['group_id' => 'required|int']);
+        $group = MessageGroup::whereId($request->input('group_id'))->firstOrFail();
 
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
             throw ValidationException::withMessages(['Player is not in the message group']);
         }
 
         $messages = Message::whereMessageGroupId($request->input('group_id'))->get();
-
         return new Response($messages);
     }
 
@@ -50,7 +44,7 @@ class MessageController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'message' => 'required|string',
             'group_id' => 'required|int',
         ]);
@@ -60,9 +54,7 @@ class MessageController extends Controller
             throw ValidationException::withMessages(['Diplomacy is not the place for profanity']);
         }
 
-        if (!$group = MessageGroup::whereId($request->input('group_id'))->first()) {
-            throw ValidationException::withMessages(['Message group does not exist']);
-        }
+        $group = MessageGroup::whereId($request->input('group_id'))->firstOrFail();
 
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player->id)) {
             throw ValidationException::withMessages(['Player is not in the message group']);
@@ -73,7 +65,6 @@ class MessageController extends Controller
         $message->player()->associate($this->session->player);
         $group->messages()->save($message);
 
-        // Return Created response
         return new CreatedResponse($message);
     }
 
@@ -100,7 +91,7 @@ class MessageController extends Controller
      */
     public function update(Message $message, Request $request)
     {
-        $this->validate($request, [
+        $request->validate([
             'message' => 'required|string',
         ]);
 
