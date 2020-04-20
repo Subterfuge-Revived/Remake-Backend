@@ -76,7 +76,6 @@ class RoomController extends Controller
         return new Response($rooms);
     }
 
-
     /**
      * Create a new room.
      *
