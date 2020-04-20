@@ -11,6 +11,7 @@ use App\Models\Player;
 use App\Models\PlayerRoom;
 use App\Models\Room;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -189,23 +190,19 @@ class RoomController extends Controller
             'map' => (int)$request->get('map'),
         ]);
 
-        return new Response($room);
+        return new Response();
     }
 
     /**
      * Destroy a room.
      * TODO: We should decide when a user should be able to delete a room precisely
      *
-     * @param $roomId
+     * @param Room $room
      * @return Response
-     * @throws \Exception
+     * @throws ValidationException|Exception
      */
-    public function destroy($roomId)
+    public function destroy(Room $room)
     {
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
-        }
-
         // Only the creator of a room can destroy it. Return unauthorized otherwise.
         if ($room->creator_player != $this->session->player) {
             return new UnauthorizedResponse();
@@ -270,7 +267,7 @@ class RoomController extends Controller
      *
      * @param Request $request
      * @return Response
-     * @throws ValidationException|\Exception
+     * @throws ValidationException|Exception
      */
     public function leave(Request $request)
     {
