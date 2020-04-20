@@ -91,3 +91,4 @@ Route::post('/', function (Request $request) {
     });
 });
 
+Route::resource('rooms', 'RoomController');
