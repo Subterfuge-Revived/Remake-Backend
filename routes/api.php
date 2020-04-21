@@ -58,7 +58,7 @@ Route::post('/', function (Request $request) {
             return (new EventController())->index($request);
         }
         if ($type === 'cancel_event') {
-            return (new EventController())->delete($request);
+            return (new EventController())->destroy($request);
         }
         if ($type === 'get_room_data') {
             return (new RoomController())->index($request);
@@ -94,3 +94,4 @@ Route::post('/', function (Request $request) {
 Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
 Route::resource('messages', 'MessageController')->except(['create', 'edit']);
 Route::resource('blocks', 'BlockController')->except(['create', 'edit']);
+Route::resource('events', 'EventController')->except(['create', 'edit']);
