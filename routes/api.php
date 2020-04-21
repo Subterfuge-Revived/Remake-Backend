@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', 'Auth\RegisterController@register');
 Route::post('/login', 'Auth\LoginController@login');
 
-Route::middleware('auth.api')->group(function () {
+Route::group(['middleware' => 'auth.api'], function () {
     Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
     Route::resource('blocks', 'BlockController')->except(['create', 'edit']);
     Route::resource('events', 'EventController')->except(['create', 'edit']);
@@ -25,4 +25,3 @@ Route::middleware('auth.api')->group(function () {
     Route::resource('groups/{group}/messages', 'MessageController')->except(['create', 'edit']);
 
 });
-
