@@ -101,21 +101,18 @@ class EventController extends Controller
     /**
      * Delete an event.
      *
-     * @param Request $request
+     * @param Event $event
      * @return Response
      * @throws ValidationException|\Exception
      */
-    public function delete(Request $request)
+    public function destroy(Event $event)
     {
-        $request->validate([
-            'room_id' => 'required|int',
-            'event_id' => 'required|int',
-        ]);
+        if (!$event->player != $this->session->player) {
+            throw ValidationException::withMessages(['Event does not belong to the given player']);
+        }
 
-        $event = $this->getEvent($request);
-
-        if (!$event->occurs_at->isFuture()) {
-            throw ValidationException::withMessages(['Event is not in the future']);
+        if (!$event->isModifiable()) {
+            throw ValidationException::withMessages(['Event may not be modified']);
         }
 
         $event->delete();
@@ -126,21 +123,20 @@ class EventController extends Controller
     /**
      * Update an event.
      *
+     * @param Event $event
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function update(Request $request)
+    public function update(Event $event, Request $request)
     {
         $request->validate([
             'room_id' => 'required|int',
-            'event_id' => 'required|int',
             'event_msg' => 'required|string',
         ]);
 
-        $event = $this->getEvent($request);
-        if (!$event->occurs_at->isFuture()) {
-            throw ValidationException::withMessages(['Event is not in the future']);
+        if (!$event->isModifiable()) {
+            throw ValidationException::withMessages(['Event may not be modified']);
         }
 
         $event->event_json = json_decode($request->input('event_msg'));
@@ -150,33 +146,19 @@ class EventController extends Controller
     }
 
     /**
-     * Validates whether the requester has access to an existing event.
-     * If so, returns the event. Otherwise, throws an exception.
+     * Show an event.
      *
-     * @param Request $request
-     * @return Event
+     * @param Event $event
+     * @return Response
      * @throws ValidationException
      */
-    private function getEvent(Request $request)
+    public function show(Event $event)
     {
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
-
-        if (!$room->players->contains($this->session->player)) {
-            throw ValidationException::withMessages(['Player is not in the room']);
-        }
-        if (!$room->isOngoing()) {
-            throw ValidationException::withMessages(['Room is not ongoing']);
-        }
-
-        /** @var Event $event */
-        if (!$event = $room->events->where('id', $request->input('event_id'))->first()) {
-            throw ValidationException::withMessages(['Event does not exist or does not belong to the room']);
-        }
-        if (!$event->player != $this->session->player) {
+        if ($event->player != $this->session->player) {
             throw ValidationException::withMessages(['Event does not belong to the given player']);
         }
 
-        return $event;
+        return new Response($event);
     }
 
 }

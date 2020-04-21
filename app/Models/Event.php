@@ -70,4 +70,15 @@ class Event extends Model
     {
         return $this->belongsTo(Room::class);
     }
+
+    /**
+     * Whether the event may be edited or deleted.
+     * @return bool
+     */
+    public function isModifiable()
+    {
+        // TODO: Does the room need to be ongoing? Seems harmless to edit future events,
+        //  if the game has already ended or has yet to start.
+        return $this->room->isOngoing() && $this->occurs_at->isFuture();
+    }
 }
