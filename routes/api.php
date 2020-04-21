@@ -92,8 +92,9 @@ Route::post('/', function (Request $request) {
 });
 
 Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
-//Route::resource('messages', 'MessageController')->except(['create', 'edit']);
 Route::resource('blocks', 'BlockController')->except(['create', 'edit']);
 Route::resource('events', 'EventController')->except(['create', 'edit']);
 
 Route::resource('groups/{group}/messages', 'MessageController')->except(['create', 'edit']);
+
+// Next up: message group controller to get a list of messages etc.
