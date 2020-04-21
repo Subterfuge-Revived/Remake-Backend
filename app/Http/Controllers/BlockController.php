@@ -80,10 +80,14 @@ class BlockController extends Controller
      * Show a block.
      *
      * @param Block $block
-     * @return Response
+     * @return Response|UnauthorizedResponse
      */
     public function show(Block $block)
     {
+        if (!$block->sender_player_id === $this->session->player_id) {
+            return new UnauthorizedResponse();
+        }
+
         return new Response($block);
     }
 
@@ -93,12 +97,16 @@ class BlockController extends Controller
      *
      * @param Block $block
      * @param Request $request
-     * @return UpdatedResponse
+     * @return UpdatedResponse|UnauthorizedResponse
      */
     public function update(Block $block, Request $request)
     {
         $request->validate(['other_player_id' => 'required|int']);
         $otherPlayer = Player::whereId($request->get('other_player_id'))->firstOrFail();
+
+        if (!$block->sender_player_id === $this->session->player_id) {
+            return new UnauthorizedResponse();
+        }
 
         $block->blocked_player()->associate($otherPlayer);
         $block->save();
@@ -106,23 +114,4 @@ class BlockController extends Controller
         return new UpdatedResponse($block);
     }
 
-    /**
-     * Unblock another player.
-     *
-     * @param Request $request
-     * @return Response
-     * @throws \Exception
-     */
-    public function delete(Request $request)
-    {
-        $this->validate($request, ['other_player_id' => 'required|int']);
-
-        /** @var Block $block */
-        $block = Block
-            ::where('sender_player_id', '=', $this->session->player_id)
-            ->where('recipient_player_id', '=', $request->input('other_player_id'))
-            ->firstOrFail();
-
-        return $this->destroy($block);
-    }
 }
