@@ -18,43 +18,38 @@ class MessageController extends Controller
     /**
      * Get the messages from the given chat group.
      *
+     * @param MessageGroup $group
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function index(Request $request)
+    public function index(MessageGroup $group)
     {
-        $request->validate(['group_id' => 'required|int']);
-        $group = MessageGroup::whereId($request->input('group_id'))->firstOrFail();
-
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
             throw ValidationException::withMessages(['Player is not in the message group']);
         }
 
-        $messages = Message::whereMessageGroupId($request->input('group_id'))->get();
-        return new Response($messages);
+        return new Response($group->messages);
     }
 
     /**
      * Create a new message.
      *
+     * @param MessageGroup $group
      * @param Request $request
      * @return CreatedResponse
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(MessageGroup $group, Request $request)
     {
         $request->validate([
             'message' => 'required|string',
-            'group_id' => 'required|int',
         ]);
 
         $profanityCheck = new ProfanityCheck();
         if ($profanityCheck->hasProfanity($request->input('message'))) {
             throw ValidationException::withMessages(['Diplomacy is not the place for profanity']);
         }
-
-        $group = MessageGroup::whereId($request->input('group_id'))->firstOrFail();
 
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player->id)) {
             throw ValidationException::withMessages(['Player is not in the message group']);
@@ -71,11 +66,19 @@ class MessageController extends Controller
     /**
      * Show a message.
      *
+     * @param MessageGroup $group
      * @param Message $message
-     * @return Response
+     * @return Response|UnauthorizedResponse
      */
-    public function show(Message $message)
+    public function show(MessageGroup $group, Message $message)
     {
+        if (
+            !$message->message_group == $group ||
+            !$group->message_group_members->pluck('player_id')->contains($this->session->player_id)
+        ) {
+            return new UnauthorizedResponse();
+        }
+
         return new Response($message);
     }
 
@@ -87,15 +90,18 @@ class MessageController extends Controller
      * @param Message $message
      * @param Request $request
      * @return UnauthorizedResponse|UpdatedResponse
-     * @throws ValidationException
      */
-    public function update(Message $message, Request $request)
+    public function update(MessageGroup $group, Message $message, Request $request)
     {
         $request->validate([
             'message' => 'required|string',
         ]);
 
-        if ($message->player != $this->session->player) {
+        if (
+            !$group->message_group_members->pluck('player_id')->contains($this->session->player_id) ||
+            !$message->message_group == $group ||
+            $message->player != $this->session->player
+        ) {
             return new UnauthorizedResponse();
         }
 
@@ -109,13 +115,18 @@ class MessageController extends Controller
      * Delete a message.
      * TODO: Determine under which circumstances we should allow this (if at all).
      *  Right now we allow all players to delete their own messages.
+     * @param MessageGroup $group
      * @param Message $message
      * @return DeletedResponse|UnauthorizedResponse
      * @throws \Exception
      */
-    public function destroy(Message $message)
+    public function destroy(MessageGroup $group, Message $message)
     {
-        if ($message->player != $this->session->player) {
+        if (
+            !$group->message_group_members->pluck('player_id')->contains($this->session->player_id) ||
+            !$message->message_group == $group ||
+            $message->player != $this->session->player
+        ) {
             return new UnauthorizedResponse();
         }
 
