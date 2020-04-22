@@ -5,12 +5,11 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 use Illuminate\Http\Request;
-use Illuminate\Session\TokenMismatchException;
 
 class AddAcceptJsonHeader extends Middleware
 {
     /**
-     * The URIs that should be excluded from CSRF verification.
+     * The URIs that should be excluded from having an Accept header injected.
      *
      * @var array
      */

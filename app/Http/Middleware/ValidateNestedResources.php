@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
 class ValidateNestedResources extends Middleware
 {
     /**
-     * Get the path the user should be redirected to when they are not authenticated.
+     * Validate that the bound models from the URI template have a possessive relationship.
      *
      * @param Request $request
      * @param Closure $next
