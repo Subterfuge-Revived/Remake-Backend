@@ -19,14 +19,12 @@ class MessageController extends Controller
      * Get the messages from the given chat group.
      *
      * @param MessageGroup $group
-     * @param Request $request
-     * @return Response
-     * @throws ValidationException
+     * @return Response|UnauthorizedResponse
      */
     public function index(MessageGroup $group)
     {
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
-            throw ValidationException::withMessages(['Player is not in the message group']);
+            return new UnauthorizedResponse();
         }
 
         return new Response($group->messages);
@@ -72,10 +70,7 @@ class MessageController extends Controller
      */
     public function show(MessageGroup $group, Message $message)
     {
-        if (
-            !$message->message_group == $group ||
-            !$group->message_group_members->pluck('player_id')->contains($this->session->player_id)
-        ) {
+        if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
             return new UnauthorizedResponse();
         }
 
@@ -87,6 +82,7 @@ class MessageController extends Controller
      * TODO: Determine under which circumstances we should allow this (if at all).
      *  Right now we allow all players to edit their own messages.
      *
+     * @param MessageGroup $group
      * @param Message $message
      * @param Request $request
      * @return UnauthorizedResponse|UpdatedResponse
@@ -99,7 +95,6 @@ class MessageController extends Controller
 
         if (
             !$group->message_group_members->pluck('player_id')->contains($this->session->player_id) ||
-            !$message->message_group == $group ||
             $message->player != $this->session->player
         ) {
             return new UnauthorizedResponse();
@@ -124,7 +119,6 @@ class MessageController extends Controller
     {
         if (
             !$group->message_group_members->pluck('player_id')->contains($this->session->player_id) ||
-            !$message->message_group == $group ||
             $message->player != $this->session->player
         ) {
             return new UnauthorizedResponse();
