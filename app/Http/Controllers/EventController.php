@@ -105,7 +105,7 @@ class EventController extends Controller
      */
     public function destroy(Room $room, Event $event)
     {
-        if (!$event->player != $this->session->player) {
+        if ($event->player != $this->session->player) {
             return new UnauthorizedResponse();
         }
 
