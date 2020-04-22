@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\UnauthorizedResponse;
 use App\Http\Responses\UpdatedResponse;
 use App\Models\Event;
 use App\Models\Room;
@@ -17,19 +18,17 @@ class EventController extends Controller
     /**
      * Show a list of events.
      *
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function index(Request $request)
+    public function index(Room $room, Request $request)
     {
         $request->validate([
-            'room_id' => 'required|int',
             'filter' => 'required|string', // Possible values: 'time', 'tick' but maybe others?
             'filter_arg' => 'required|string',
         ]);
-
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
@@ -60,14 +59,14 @@ class EventController extends Controller
     /**
      * Create an event.
      *
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(Room $room, Request $request)
     {
         $request->validate([
-            'room_id' => 'required|int',
             'event_msg' => 'required|string',
             'occurs_at' => 'required|string',
         ]);
@@ -76,8 +75,6 @@ class EventController extends Controller
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw ValidationException::withMessages(['Invalid event message: not valid JSON']);
         }
-
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in room']);
@@ -101,14 +98,15 @@ class EventController extends Controller
     /**
      * Delete an event.
      *
+     * @param Room $room
      * @param Event $event
-     * @return Response
+     * @return Response|UnauthorizedResponse
      * @throws ValidationException|\Exception
      */
-    public function destroy(Event $event)
+    public function destroy(Room $room, Event $event)
     {
         if (!$event->player != $this->session->player) {
-            throw ValidationException::withMessages(['Event does not belong to the given player']);
+            return new UnauthorizedResponse();
         }
 
         if (!$event->isModifiable()) {
@@ -123,15 +121,15 @@ class EventController extends Controller
     /**
      * Update an event.
      *
+     * @param Room $room
      * @param Event $event
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function update(Event $event, Request $request)
+    public function update(Room $room, Event $event, Request $request)
     {
         $request->validate([
-            'room_id' => 'required|int',
             'event_msg' => 'required|string',
         ]);
 
@@ -148,14 +146,14 @@ class EventController extends Controller
     /**
      * Show an event.
      *
+     * @param Room $room
      * @param Event $event
-     * @return Response
-     * @throws ValidationException
+     * @return Response|UnauthorizedResponse
      */
-    public function show(Event $event)
+    public function show(Room $room, Event $event)
     {
         if ($event->player != $this->session->player) {
-            throw ValidationException::withMessages(['Event does not belong to the given player']);
+            return new UnauthorizedResponse();
         }
 
         return new Response($event);
