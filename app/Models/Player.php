@@ -36,6 +36,7 @@ use Str;
  * @property Collection|Room[] $rooms
  * @property Collection|PlayerSession[] $player_sessions
  * @property Collection|Player[] $blocked_players
+ * @property Collection|MessageGroup[] $message_groups
  * @package App\Models
  * @property-read int|null $blocks_count
  * @property-read int|null $events_count
