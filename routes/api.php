@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/register', 'Auth\RegisterController@register');
-Route::post('/login', 'Auth\LoginController@login');
+Route::post('/register', 'Auth\RegisterController@register')->name('register');
+Route::post('/login', 'Auth\LoginController@login')->name('login');
 
 Route::group(['middleware' => 'auth.api'], function () {
     Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
