@@ -131,6 +131,21 @@ class Player extends Authenticatable
     }
 
     /**
+     * @return HasManyThrough
+     */
+    public function message_groups()
+    {
+        return $this->hasManyThrough(
+            MessageGroup::class,
+            MessageGroupMember::class,
+            'player_id',
+            'id',
+            'id',
+            'message_group_id'
+        );
+    }
+
+    /**
      * @return HasMany
      */
     public function rooms()
