@@ -7,6 +7,9 @@
  * @author   Taylor Otwell <taylor@laravel.com>
  */
 
+use App\Http\Kernel;
+use App\Http\Middleware\ValidateNestedResources;
+
 define('LARAVEL_START', microtime(true));
 
 /*
@@ -49,7 +52,9 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 |
 */
 
+/** @var Kernel $kernel */
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$kernel->appendToMiddlewarePriority(ValidateNestedResources::class);
 
 $response = $kernel->handle(
     $request = Illuminate\Http\Request::capture()
