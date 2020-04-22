@@ -22,6 +22,7 @@ Route::group(['middleware' => 'auth.api'], function () {
     Route::resource('events', 'EventController')->except(['create', 'edit']);
 
     // Next up: message group controller to get a list of messages etc.
-    Route::resource('groups/{group}/messages', 'MessageController')->except(['create', 'edit']);
+    Route::resource('groups', 'MessageGroupController')->except(['create', 'edit']);
+    Route::resource('groups.messages', 'MessageController')->except(['create', 'edit']);
 
 });
