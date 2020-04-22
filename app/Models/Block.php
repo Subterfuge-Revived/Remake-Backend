@@ -42,6 +42,7 @@ class Block extends Model
     ];
 
     protected $visible = [
+        'id',
         'sender_player_id',
         'recipient_player_id',
     ];
