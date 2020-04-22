@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Http\Responses\NotFoundResponse;
 use Closure;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class ValidateNestedResources extends Middleware
 {
@@ -30,7 +30,7 @@ class ValidateNestedResources extends Middleware
                 // The parent model does not have a relation to its child model.
                 // Note that we assume that the relationship is defined on the
                 // parent model and has the same name as the table name of the child.
-                return new Response('Could not resolve resource', 500);
+                return new NotFoundResponse();
             }
         }
 
