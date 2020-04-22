@@ -1,3 +1,11 @@
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---
 
 ## Enhancement Description
 <!-- Present a description of the problem to be addressed by this feature request. -->
