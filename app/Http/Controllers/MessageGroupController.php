@@ -23,7 +23,7 @@ class MessageGroupController extends Controller
      */
     public function index(Request $request)
     {
-        return new Response($this->session->player->message_groups);
+        return new Response($this->session->player->message_groups->load('message_group_members.player'));
     }
 
     /**
@@ -92,7 +92,7 @@ class MessageGroupController extends Controller
             return new UnauthorizedResponse();
         }
 
-        return new Response($group);
+        return new Response($group->load('message_group_members.player'));
     }
 
     /**
