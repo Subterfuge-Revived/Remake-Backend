@@ -67,7 +67,7 @@ class BlockController extends Controller
      */
     public function destroy(Block $block)
     {
-        if (!$block->sender_player_id == $this->session->player_id) {
+        if ($block->sender_player_id !== $this->session->player_id) {
             return new UnauthorizedResponse();
         }
 
@@ -84,7 +84,7 @@ class BlockController extends Controller
      */
     public function show(Block $block)
     {
-        if (!$block->sender_player_id === $this->session->player_id) {
+        if ($block->sender_player_id !== $this->session->player_id) {
             return new UnauthorizedResponse();
         }
 
@@ -104,7 +104,7 @@ class BlockController extends Controller
         $request->validate(['other_player_id' => 'required|int']);
         $otherPlayer = Player::whereId($request->get('other_player_id'))->firstOrFail();
 
-        if (!$block->sender_player_id === $this->session->player_id) {
+        if ($block->sender_player_id !== $this->session->player_id) {
             return new UnauthorizedResponse();
         }
 
