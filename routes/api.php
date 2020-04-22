@@ -28,8 +28,8 @@ Route::group(['middleware' => 'auth.api'], function () {
     Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
     Route::resource('rooms.events', 'EventController')->except(['create', 'edit']);
 
-    Route::post('rooms/{room}/join', 'RoomController@join');
-    Route::post('rooms/{room}/leave', 'RoomController@leave');
-    Route::post('rooms/{room}/start', 'RoomController@startEarly');
+    Route::post('rooms/{room}/join', 'RoomController@join')->name('rooms.join');
+    Route::post('rooms/{room}/leave', 'RoomController@leave')->name('rooms.leave');
+    Route::post('rooms/{room}/start', 'RoomController@startEarly')->name('rooms.start');
 
 });
