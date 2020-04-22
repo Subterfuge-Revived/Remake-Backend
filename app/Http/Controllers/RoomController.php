@@ -220,16 +220,12 @@ class RoomController extends Controller
     /**
      * Join a room.
      *
-     * @param Request $request
+     * @param Room $room
      * @return Response
      * @throws ValidationException
      */
-    public function join(Request $request)
+    public function join(Room $room)
     {
-        $request->validate(['room_id' => 'required|int']);
-
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
-
         if ($this->session->player->rating < $room->min_rating) {
             throw ValidationException::withMessages(['Insufficient rating']);
         }
@@ -264,16 +260,12 @@ class RoomController extends Controller
     /**
      * Leave a room.
      *
-     * @param Request $request
+     * @param Room $room
      * @return Response
-     * @throws ValidationException|Exception
+     * @throws ValidationException
      */
-    public function leave(Request $request)
+    public function leave(Room $room)
     {
-        $request->validate(['room_id' => 'required|int']);
-
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
-
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
         }
@@ -295,14 +287,12 @@ class RoomController extends Controller
     /**
      * Start a room early.
      *
-     * @param Request $request
+     * @param Room $room
      * @return Response
      * @throws ValidationException
      */
-    public function startEarly(Request $request)
+    public function startEarly(Room $room)
     {
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
-
         if ($room->creator_player != $this->session->player) {
             return new UnauthorizedResponse();
         }

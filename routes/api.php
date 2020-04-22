@@ -19,10 +19,17 @@ Route::post('/login', 'Auth\LoginController@login')->name('login');
 Route::group(['middleware' => 'auth.api'], function () {
 
     Route::resource('blocks', 'BlockController')->except(['create', 'edit']);
-    Route::resource('events', 'EventController')->except(['create', 'edit']);
+
     Route::resource('goals', 'GoalController')->except(['create', 'edit']);
+
     Route::resource('groups', 'MessageGroupController')->except(['create', 'edit']);
     Route::resource('groups.messages', 'MessageController')->except(['create', 'edit']);
+
     Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
+    Route::resource('rooms.events', 'EventController')->except(['create', 'edit']);
+
+    Route::post('rooms/{room}/join', 'RoomController@join');
+    Route::post('rooms/{room}/leave', 'RoomController@leave');
+    Route::post('rooms/{room}/start', 'RoomController@startEarly');
 
 });
