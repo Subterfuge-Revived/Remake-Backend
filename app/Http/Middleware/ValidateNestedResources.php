@@ -4,10 +4,9 @@ namespace App\Http\Middleware;
 
 use App\Http\Responses\NotFoundResponse;
 use Closure;
-use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
 
-class ValidateNestedResources extends Middleware
+class ValidateNestedResources
 {
     /**
      * Validate that the bound models from the URI template have a possessive relationship.

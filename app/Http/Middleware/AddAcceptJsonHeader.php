@@ -3,10 +3,9 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 use Illuminate\Http\Request;
 
-class AddAcceptJsonHeader extends Middleware
+class AddAcceptJsonHeader
 {
     /**
      * The URIs that should be excluded from having an Accept header injected.
