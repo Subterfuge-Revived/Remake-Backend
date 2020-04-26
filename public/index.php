@@ -54,6 +54,7 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 
 /** @var Kernel $kernel */
 $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$kernel->prependToMiddlewarePriority(\App\Http\Middleware\AddGetParametersToRequestBody::class);
 $kernel->appendToMiddlewarePriority(ValidateNestedResources::class);
 
 $response = $kernel->handle(

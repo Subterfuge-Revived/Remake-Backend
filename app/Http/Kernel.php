@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\AddAcceptJsonHeader;
+use App\Http\Middleware\AddGetParametersToRequestBody;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\AuthenticateAPI;
 use App\Http\Middleware\CheckForMaintenanceMode;
@@ -69,6 +70,7 @@ class Kernel extends HttpKernel
             AddAcceptJsonHeader::class,
             SubstituteBindings::class,
             ValidateNestedResources::class,
+            AddGetParametersToRequestBody::class,
         ],
     ];
 
