@@ -67,7 +67,7 @@ class RoomController extends Controller
                     : $room->players->map(function (Player $player) {
                         return ['name' => $player->name, 'id' => $player->id];
                     }),
-                'message_groups' => $room->message_groups()->whereHas('message_group_members', function (Builder $query) {
+                'message_groups' => $room->groups()->whereHas('message_group_members', function (Builder $query) {
                     $query->where('player_id', '=', $this->session->player_id);
                 })->get(),
             ];
