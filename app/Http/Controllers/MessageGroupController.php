@@ -18,12 +18,19 @@ class MessageGroupController extends Controller
 
     /**
      * Return a list of message groups that the player is in.
+     * @param Room $room
      * @param Request $request
      * @return Response
      */
-    public function index(Request $request)
+    public function index(Room $room, Request $request)
     {
-        return new Response($this->session->player->message_groups->load('message_group_members.player'));
+        $messageGroups = $this->session->player
+            ->message_groups()
+            ->where('room_id', '=', $room->id)
+            ->with('message_group_members.player')
+            ->get();
+
+        return new Response($messageGroups);
     }
 
     /**
@@ -83,10 +90,11 @@ class MessageGroupController extends Controller
     }
 
     /**
+     * @param Room $room
      * @param MessageGroup $group
      * @return Response|UnauthorizedResponse
      */
-    public function show(MessageGroup $group)
+    public function show(Room $room, MessageGroup $group)
     {
         if (!$this->session->player->message_groups->contains($group)) {
             return new UnauthorizedResponse();
@@ -96,21 +104,23 @@ class MessageGroupController extends Controller
     }
 
     /**
+     * @param Room $room
      * @param MessageGroup $group
      * @param Request $request
      * @return UnauthorizedResponse
      */
-    public function update(MessageGroup $group, Request $request)
+    public function update(Room $room, MessageGroup $group, Request $request)
     {
         // It is nonsensical to update a MessageGroup as it has no real properties on its own.
         return new UnauthorizedResponse();
     }
 
     /**
+     * @param Room $room
      * @param MessageGroup $group
      * @return UnauthorizedResponse
      */
-    public function destroy(MessageGroup $group)
+    public function destroy(Room $room, MessageGroup $group)
     {
         // Perhaps an admin should be allowed to delete a chat group?
         // But it makes no sense for any of the group members to delete the whole chat.
