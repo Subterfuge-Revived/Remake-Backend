@@ -20,7 +20,8 @@ class CreatedResponse extends Response
         parent::__construct($content, $status, $headers);
 
         if (!$this->headers->has('Location')) {
-            $this->header('Location', resource_url($model));
+            $this->header('Location', RequestFacade::url() . "/{$model->id}");
         }
+
     }
 }
