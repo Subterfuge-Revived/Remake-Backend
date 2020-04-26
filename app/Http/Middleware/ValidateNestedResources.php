@@ -21,11 +21,8 @@ class ValidateNestedResources
         $parent = null;
         $segments = $request->segments();
 
-        // The route may have additional segments on the left side. Therefore,
-        // we have to determine the offset. Note that each bound parameter contributes
-        // two segments: the segment name and the bound id(entifier).
-        // We will subtract these to the total segment count to get the offset.
-        $segmentOffset = count($segments) - 2*count($request->route()->parameters());
+        // We will begin validating resources after the 'api' segment.
+        $segmentOffset = array_search('api', $segments) + 1;
         $parameterIndex = -1;
 
         foreach ($request->route()->parameters() as $parameter) {
