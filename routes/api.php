@@ -22,8 +22,8 @@ Route::group(['middleware' => 'auth.api'], function () {
 
     Route::resource('goals', 'GoalController')->except(['create', 'edit']);
 
-    Route::resource('groups', 'MessageGroupController')->except(['create', 'edit']);
-    Route::resource('groups.messages', 'MessageController')->except(['create', 'edit']);
+    Route::resource('rooms.groups', 'MessageGroupController')->except(['create', 'edit']);
+    Route::resource('rooms.groups.messages', 'MessageController')->except(['create', 'edit']);
 
     Route::resource('rooms', 'RoomController')->except(['create', 'edit']);
     Route::resource('rooms.events', 'EventController')->except(['create', 'edit']);
