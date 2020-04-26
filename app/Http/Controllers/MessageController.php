@@ -8,6 +8,7 @@ use App\Http\Responses\UpdatedResponse;
 use App\Models\Message;
 use App\Models\MessageGroup;
 use App\Http\Responses\CreatedResponse;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
@@ -18,10 +19,11 @@ class MessageController extends Controller
     /**
      * Get the messages from the given chat group.
      *
+     * @param Room $room
      * @param MessageGroup $group
      * @return Response|UnauthorizedResponse
      */
-    public function index(MessageGroup $group)
+    public function index(Room $room, MessageGroup $group)
     {
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
             return new UnauthorizedResponse();
@@ -33,12 +35,13 @@ class MessageController extends Controller
     /**
      * Create a new message.
      *
+     * @param Room $room
      * @param MessageGroup $group
      * @param Request $request
      * @return CreatedResponse
      * @throws ValidationException
      */
-    public function store(MessageGroup $group, Request $request)
+    public function store(Room $room, MessageGroup $group, Request $request)
     {
         $request->validate([
             'message' => 'required|string',
@@ -64,11 +67,12 @@ class MessageController extends Controller
     /**
      * Show a message.
      *
+     * @param Room $room
      * @param MessageGroup $group
      * @param Message $message
      * @return Response|UnauthorizedResponse
      */
-    public function show(MessageGroup $group, Message $message)
+    public function show(Room $room, MessageGroup $group, Message $message)
     {
         if (!$group->message_group_members->pluck('player_id')->contains($this->session->player_id)) {
             return new UnauthorizedResponse();
@@ -82,12 +86,13 @@ class MessageController extends Controller
      * TODO: Determine under which circumstances we should allow this (if at all).
      *  Right now we allow all players to edit their own messages.
      *
+     * @param Room $room
      * @param MessageGroup $group
      * @param Message $message
      * @param Request $request
      * @return UnauthorizedResponse|UpdatedResponse
      */
-    public function update(MessageGroup $group, Message $message, Request $request)
+    public function update(Room $room, MessageGroup $group, Message $message, Request $request)
     {
         $request->validate([
             'message' => 'required|string',
@@ -110,12 +115,13 @@ class MessageController extends Controller
      * Delete a message.
      * TODO: Determine under which circumstances we should allow this (if at all).
      *  Right now we allow all players to delete their own messages.
+     * @param Room $room
      * @param MessageGroup $group
      * @param Message $message
      * @return DeletedResponse|UnauthorizedResponse
      * @throws \Exception
      */
-    public function destroy(MessageGroup $group, Message $message)
+    public function destroy(Room $room, MessageGroup $group, Message $message)
     {
         if (
             !$group->message_group_members->pluck('player_id')->contains($this->session->player_id) ||
