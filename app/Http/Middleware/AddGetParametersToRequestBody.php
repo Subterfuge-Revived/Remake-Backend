@@ -2,13 +2,10 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Responses\UnauthorizedResponse;
-use App\Models\PlayerSession;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use function GuzzleHttp\Psr7\parse_query;
 
-class AuthenticateAPI extends Authenticate
+class AddGetParametersToRequestBody
 {
     /**
      * Handle an incoming request.
@@ -20,10 +17,11 @@ class AuthenticateAPI extends Authenticate
      */
     public function handle($request, \Closure $next, ...$guards)
     {
-        $session = PlayerSession::findByToken($request->input('session_id') ?? '');
-
-        if (!$session || !$session->isValid()) {
-            return new UnauthorizedResponse();
+        if ($request->method() === 'GET') {
+            $queryParameters = parse_query($request->getContent());
+            foreach ($queryParameters as $key => $value) {
+                $request->request->set($key, $value);
+            }
         }
 
         return $next($request);

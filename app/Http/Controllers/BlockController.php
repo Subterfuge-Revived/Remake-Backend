@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\CreatedResponse;
 use App\Http\Responses\DeletedResponse;
-use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\UnauthorizedResponse;
+use App\Http\Responses\UpdatedResponse;
 use App\Models\Block;
 use App\Models\Player;
 use Illuminate\Http\Request;
@@ -13,6 +14,18 @@ use Illuminate\Validation\ValidationException;
 
 class BlockController extends Controller
 {
+    /**
+     * Get the list of blocked players.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function index(Request $request)
+    {
+        $blocks = Block::whereSenderPlayerId($this->session->player_id)->get();
+        return new Response($blocks);
+    }
+
     /**
      * Block another player.
      *
@@ -26,9 +39,8 @@ class BlockController extends Controller
             'other_player_id' => 'required|int',
         ])->validate();
 
-        if (!$otherPlayer = Player::whereId($request->input('other_player_id'))->first()) {
-            throw ValidationException::withMessages(['Player does not exist']);
-        }
+        $otherPlayer = Player::whereId($request->input('other_player_id'))->firstOrFail();
+
         if ($otherPlayer == $this->session->player) {
             throw ValidationException::withMessages(['You cannot block yourself']);
         }
@@ -47,25 +59,16 @@ class BlockController extends Controller
     }
 
     /**
-     * Unblock another player.
+     * Delete a block (effectively unblocking another player).
      *
-     * @param Request $request
-     * @return Response
+     * @param Block $block
+     * @return DeletedResponse|UnauthorizedResponse
      * @throws \Exception
      */
-    public function delete(Request $request)
+    public function destroy(Block $block)
     {
-        \Validator::make($request->all(), [
-            'other_player_id' => 'required|int',
-        ])->validate();
-
-        if (!$block = Block
-            ::where('sender_player_id', '=', $this->session->player_id)
-            ->where('recipient_player_id', '=', $request->input('other_player_id'))
-            ->first()
-        ) {
-            // No such block found
-            return new NotFoundResponse();
+        if ($block->sender_player_id !== $this->session->player_id) {
+            return new UnauthorizedResponse();
         }
 
         $block->delete();
@@ -74,14 +77,41 @@ class BlockController extends Controller
     }
 
     /**
-     * Get the list of blocked players.
+     * Show a block.
      *
-     * @param Request $request
-     * @return Response
+     * @param Block $block
+     * @return Response|UnauthorizedResponse
      */
-    public function index(Request $request)
+    public function show(Block $block)
     {
-        $blocks = Block::whereSenderPlayerId($this->session->player_id)->get();
-        return new Response($blocks);
+        if ($block->sender_player_id !== $this->session->player_id) {
+            return new UnauthorizedResponse();
+        }
+
+        return new Response($block);
     }
+
+    /**
+     * It currently makes little to no sense to update a block.
+     * However, in the RESTful API we will allow a player to change
+     *
+     * @param Block $block
+     * @param Request $request
+     * @return UpdatedResponse|UnauthorizedResponse
+     */
+    public function update(Block $block, Request $request)
+    {
+        $request->validate(['other_player_id' => 'required|int']);
+        $otherPlayer = Player::whereId($request->get('other_player_id'))->firstOrFail();
+
+        if ($block->sender_player_id !== $this->session->player_id) {
+            return new UnauthorizedResponse();
+        }
+
+        $block->blocked_player()->associate($otherPlayer);
+        $block->save();
+
+        return new UpdatedResponse($block);
+    }
+
 }

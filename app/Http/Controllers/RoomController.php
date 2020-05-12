@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\CreatedResponse;
 use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\NotFoundResponse;
 use App\Http\Responses\UnauthorizedResponse;
@@ -10,6 +11,7 @@ use App\Models\Player;
 use App\Models\PlayerRoom;
 use App\Models\Room;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -20,23 +22,6 @@ use mofodojodino\ProfanityFilter\Check as ProfanityCheck;
 
 class RoomController extends Controller
 {
-
-    /**
-     * @param Request $request
-     * @return Validator
-     */
-    public function validator(Request $request)
-    {
-        return \Validator::make($request->all(), [
-            'max_players' => 'required|int|between:2,10',
-            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
-            'description' => 'required|string',
-            'map' => 'required|int|between:0,3',
-            'min_rating' => 'required|int|min:0', // TODO: Make this optional for open games?
-            'rated' => 'required|boolean',
-            'anonymity' => 'required|boolean',
-        ]);
-    }
 
     /**
      * Get a collection of relevant rooms.
@@ -82,7 +67,7 @@ class RoomController extends Controller
                     : $room->players->map(function (Player $player) {
                         return ['name' => $player->name, 'id' => $player->id];
                     }),
-                'message_groups' => $room->message_groups()->whereHas('message_group_members', function (Builder $query) {
+                'message_groups' => $room->groups()->whereHas('message_group_members', function (Builder $query) {
                     $query->where('player_id', '=', $this->session->player_id);
                 })->get(),
             ];
@@ -90,7 +75,6 @@ class RoomController extends Controller
 
         return new Response($rooms);
     }
-
 
     /**
      * Create a new room.
@@ -101,7 +85,15 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validator($request)->validate();
+        $request->validate([
+            'max_players' => 'required|int|between:2,10',
+            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
+            'description' => 'required|string',
+            'map' => 'required|int|between:0,3',
+            'min_rating' => 'required|int|min:0', // TODO: Make this  for open games?
+            'rated' => 'required|boolean',
+            'anonymity' => 'required|boolean',
+        ]);
 
         $minRating = $request->get('rated')
             ? $request->get('min_rating')
@@ -136,54 +128,39 @@ class RoomController extends Controller
         $playerRoom->room()->associate($room);
 		$playerRoom->save();
 
-        // TODO: In style with the other APIs we should return an empty 201 response
-        // with a Location header to the room.
-        return new Response([
-            'created_room' => [
-                'room_id' => $room->id,
-                'creator' => $this->session->player->id,
-                'description' => $room->description,
-                'rated' => (bool)$room->is_rated,
-                'max_players' => $room->max_players,
-                'player_count' => 1, // TODO: This is always only the creator, do we really need to return this?
-                'min_rating' => $room->min_rating,
-                'goal' => $room->goal->identifier,
-                'anonymity' => (bool)$room->is_anonymous,
-                'map' => $room->map,
-                'seed' => $room->seed,
-            ],
-        ]);
+        return new CreatedResponse($room);
     }
 
     /**
      * Show a room.
      *
-     * @param int $roomId
+     * @param Room $room
      * @return Response
      */
-    public function show(int $roomId)
+    public function show(Room $room)
     {
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
-        }
-
         return new Response($room);
     }
 
     /**
      * Update a room.
      *
-     * @param $roomId
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function update($roomId, Request $request)
+    public function update(Room $room, Request $request)
     {
-        $this->validator($request)->validate();
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
-        }
+        $request->validate([
+            'max_players' => 'required|int|between:2,10',
+            'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
+            'description' => 'required|string',
+            'map' => 'required|int|between:0,3',
+            'min_rating' => 'required|int|min:0', // TODO: Make this  for open games?
+            'rated' => 'required|boolean',
+            'anonymity' => 'required|boolean',
+        ]);
 
         if ($room->hasStarted()) {
             throw ValidationException::withMessages(['Room has already started']);
@@ -199,37 +176,32 @@ class RoomController extends Controller
         }
 
         $minRating = $request->get('rated')
-            ? $request->get('min_rating')
+            ? (int)$request->get('min_rating')
             : 0;
 
         $room->goal()->associate(Goal::whereIdentifier($request->get('goal'))->first());
         $room->update([
             'description' => $request->get('description'),
-            'is_rated' => $request->get('rated'),
-            'is_anonymous' => $request->get('anonymity'),
-            'max_players' => $request->get('max_players'),
+            'is_rated' => (bool)$request->get('rated'),
+            'is_anonymous' => (bool)$request->get('anonymity'),
+            'max_players' => (int)$request->get('max_players'),
             'min_rating' => $minRating,
-            'map' => $request->get('map'),
-            'seed' => Carbon::now()->unix(),
+            'map' => (int)$request->get('map'),
         ]);
 
-        return new Response($room);
+        return new Response();
     }
 
     /**
      * Destroy a room.
      * TODO: We should decide when a user should be able to delete a room precisely
      *
-     * @param $roomId
+     * @param Room $room
      * @return Response
-     * @throws \Exception
+     * @throws ValidationException|Exception
      */
-    public function destroy($roomId)
+    public function destroy(Room $room)
     {
-        if (!$room = Room::whereId($roomId)->first()) {
-            return new NotFoundResponse();
-        }
-
         // Only the creator of a room can destroy it. Return unauthorized otherwise.
         if ($room->creator_player != $this->session->player) {
             return new UnauthorizedResponse();
@@ -248,16 +220,12 @@ class RoomController extends Controller
     /**
      * Join a room.
      *
-     * @param Request $request
+     * @param Room $room
      * @return Response
      * @throws ValidationException
      */
-    public function join(Request $request)
+    public function join(Room $room)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
-
         if ($this->session->player->rating < $room->min_rating) {
             throw ValidationException::withMessages(['Insufficient rating']);
         }
@@ -292,16 +260,12 @@ class RoomController extends Controller
     /**
      * Leave a room.
      *
-     * @param Request $request
+     * @param Room $room
      * @return Response
-     * @throws ValidationException|\Exception
+     * @throws ValidationException
      */
-    public function leave(Request $request)
+    public function leave(Room $room)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
-
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
         }
@@ -323,16 +287,12 @@ class RoomController extends Controller
     /**
      * Start a room early.
      *
-     * @param Request $request
+     * @param Room $room
      * @return Response
      * @throws ValidationException
      */
-    public function startEarly(Request $request)
+    public function startEarly(Room $room)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
-
         if ($room->creator_player != $this->session->player) {
             return new UnauthorizedResponse();
         }

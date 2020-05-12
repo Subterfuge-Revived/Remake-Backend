@@ -36,6 +36,7 @@ use Str;
  * @property Collection|Room[] $rooms
  * @property Collection|PlayerSession[] $player_sessions
  * @property Collection|Player[] $blocked_players
+ * @property Collection|MessageGroup[] $message_groups
  * @package App\Models
  * @property-read int|null $blocks_count
  * @property-read int|null $events_count
@@ -72,6 +73,7 @@ class Player extends Authenticatable
 
     protected $hidden = [
         'password',
+        'email',
     ];
 
     protected $fillable = [
@@ -128,6 +130,21 @@ class Player extends Authenticatable
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender_player_id');
+    }
+
+    /**
+     * @return HasManyThrough
+     */
+    public function message_groups()
+    {
+        return $this->hasManyThrough(
+            MessageGroup::class,
+            MessageGroupMember::class,
+            'player_id',
+            'id',
+            'id',
+            'message_group_id'
+        );
     }
 
     /**

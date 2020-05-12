@@ -4,6 +4,7 @@ namespace App\Http\Responses;
 
 use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Request as RequestFacade;
 
 class CreatedResponse extends Response
 {
@@ -17,14 +18,11 @@ class CreatedResponse extends Response
      */
     public function __construct(Model $model, $content = '', $status = 201, array $headers = [])
     {
-        parent::__construct($content, $status, $headers);
+        parent::__construct($content ? $content : $model, $status, $headers);
 
         if (!$this->headers->has('Location')) {
-            // By default, we will assume our REST APIs will follow the naming convention
-            // identical to our database structure. However, we may override this by specifying
-            // a resourcePath attribute on the model if we want.
-            $location = $model->resourcePath ?? $model->getTable();
-            $this->header('Location', url("$location/{$model->id}"));
+            $this->header('Location', RequestFacade::url() . "/{$model->id}");
         }
+
     }
 }

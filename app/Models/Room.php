@@ -112,7 +112,7 @@ class Room extends Model
     /**
      * @return HasMany
      */
-    public function message_groups()
+    public function groups()
     {
         return $this->hasMany(MessageGroup::class);
     }

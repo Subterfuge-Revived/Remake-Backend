@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\NotFoundResponse;
+use App\Http\Responses\UnauthorizedResponse;
 use App\Http\Responses\UpdatedResponse;
 use App\Models\Event;
 use App\Models\Room;
@@ -17,21 +18,17 @@ class EventController extends Controller
     /**
      * Show a list of events.
      *
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function index(Request $request)
+    public function index(Room $room, Request $request)
     {
-        \Validator::make($request->all(), [
-            'room_id' => 'required|int',
+        $request->validate([
             'filter' => 'required|string', // Possible values: 'time', 'tick' but maybe others?
             'filter_arg' => 'required|string',
-        ])->validate();
-
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
+        ]);
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in the room']);
@@ -62,32 +59,28 @@ class EventController extends Controller
     /**
      * Create an event.
      *
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(Room $room, Request $request)
     {
-        \Validator::make($request->all(), [
-            'room_id' => 'required|int',
+        $request->validate([
             'event_msg' => 'required|string',
             'occurs_at' => 'required|string',
-        ])->validate();
+        ]);
 
         json_decode($request->input('event_msg'));
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw ValidationException::withMessages(['Invalid event message: not valid JSON']);
         }
 
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            return new NotFoundResponse();
-        }
-
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['Player is not in room']);
         }
 
-        if (!$room->hasStarted() || $room->hasEnded()) {
+        if (!$room->isOngoing()) {
             throw ValidationException::withMessages(['Room is not ongoing']);
         }
 
@@ -105,21 +98,19 @@ class EventController extends Controller
     /**
      * Delete an event.
      *
-     * @param Request $request
-     * @return Response
+     * @param Room $room
+     * @param Event $event
+     * @return Response|UnauthorizedResponse
      * @throws ValidationException|\Exception
      */
-    public function delete(Request $request)
+    public function destroy(Room $room, Event $event)
     {
-        \Validator::make($request->all(), [
-            'room_id' => 'required|int',
-            'event_id' => 'required|int',
-        ]);
+        if ($event->player != $this->session->player) {
+            return new UnauthorizedResponse();
+        }
 
-        $event = $this->getEvent($request);
-
-        if (!$event->occurs_at->isFuture()) {
-            throw ValidationException::withMessages(['Event is not in the future']);
+        if (!$event->isModifiable()) {
+            throw ValidationException::withMessages(['Event may not be modified']);
         }
 
         $event->delete();
@@ -130,21 +121,20 @@ class EventController extends Controller
     /**
      * Update an event.
      *
+     * @param Room $room
+     * @param Event $event
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function update(Request $request)
+    public function update(Room $room, Event $event, Request $request)
     {
-        \Validator::make($request->all(), [
-            'room_id' => 'required|int',
-            'event_id' => 'required|int',
+        $request->validate([
             'event_msg' => 'required|string',
         ]);
 
-        $event = $this->getEvent($request);
-        if (!$event->occurs_at->isFuture()) {
-            throw ValidationException::withMessages(['Event is not in the future']);
+        if (!$event->isModifiable()) {
+            throw ValidationException::withMessages(['Event may not be modified']);
         }
 
         $event->event_json = json_decode($request->input('event_msg'));
@@ -154,34 +144,19 @@ class EventController extends Controller
     }
 
     /**
-     * Validates whether the requester has access to an existing event.
-     * If so, returns the event. Otherwise, throws an exception.
+     * Show an event.
      *
-     * @param Request $request
-     * @return Event
-     * @throws ValidationException
+     * @param Room $room
+     * @param Event $event
+     * @return Response|UnauthorizedResponse
      */
-    private function getEvent(Request $request)
+    public function show(Room $room, Event $event)
     {
-        if (!$room = Room::whereId($request->input('room_id'))->first()) {
-            throw ValidationException::withMessages(['Room does not exist']);
-        }
-        if (!$room->players->contains($this->session->player)) {
-            throw ValidationException::withMessages(['Player is not in the room']);
-        }
-        if (!$room->hasStarted() || $room->hasEnded()) {
-            throw ValidationException::withMessages(['Room is not ongoing']);
+        if ($event->player != $this->session->player) {
+            return new UnauthorizedResponse();
         }
 
-        /** @var Event $event */
-        if (!$event = $room->events->where('id', $request->input('event_id'))->first()) {
-            throw ValidationException::withMessages(['Event does not exist or does not belong to the room']);
-        }
-        if (!$event->player != $this->session->player) {
-            throw ValidationException::withMessages(['Event does not belong to the given player']);
-        }
-
-        return $event;
+        return new Response($event);
     }
 
 }
