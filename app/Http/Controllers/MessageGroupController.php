@@ -36,19 +36,17 @@ class MessageGroupController extends Controller
     /**
      * Create a new message group.
      *
+     * @param Room $room
      * @param Request $request
      * @return Response
      * @throws ValidationException
      */
-    public function store(Request $request)
+    public function store(Room $room, Request $request)
     {
         $request->validate([
-            'room_id' => 'required|int',
             'participants' => 'required|array',
             'participants.*' => 'required|int|' . Rule::in(Player::pluck('id')),
         ]);
-
-        $room = Room::whereId($request->input('room_id'))->firstOrFail();
 
         if (!$room->players->contains($this->session->player)) {
             throw ValidationException::withMessages(['You are not part of this room']);
@@ -60,7 +58,7 @@ class MessageGroupController extends Controller
 
         // The participants are the creator and the other players that he invites
         $participants = Player::whereIn('id', $request->input('participants'))
-            ->get()->add($this->session->player);
+            ->get()->add($this->session->player)->unique();
 
         if ($this->session->player->blocked_players
             ->intersect($participants)
