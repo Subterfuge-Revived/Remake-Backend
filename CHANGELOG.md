@@ -22,3 +22,4 @@ Re-implementation of the back-end in Laravel.
  - When fetching events from a room, it is no longer necessary for the room to be ongoing. Instead, for rooms that haven't yet started, an empty list of events is returned.
  - When a room is deleted, an empty `204 No Content` response is returned instead of returning an id that is no longer in use.
  - When calling `get_room_data`, closed rooms are not shown by default. This can be overridden by including a parameter `return_closed_rooms` with value `true`.
+ - When a player leaving the room renders the room without players, it is now (soft) deleted.
