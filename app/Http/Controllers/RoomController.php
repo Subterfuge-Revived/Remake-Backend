@@ -263,6 +263,7 @@ class RoomController extends Controller
      * @param Room $room
      * @return Response
      * @throws ValidationException
+     * @throws Exception
      */
     public function leave(Room $room)
     {
@@ -278,6 +279,11 @@ class RoomController extends Controller
         $this->session->player->save();
 
         $room->refresh();
+
+        if ($room->players->isEmpty()) {
+            $room->delete();
+            return new DeletedResponse($room);
+        }
 
         // Since we have indirectly updated the room resource,
         // it makes sense to return it.
