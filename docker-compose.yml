@@ -22,5 +22,21 @@ services:
     env_file:
       - ./.env
 
+  redis:
+    image: redis:6.0.6-alpine
+    command: redis-server --requirepass change_this_password_in_prod
+    volumes:
+      - "./redis-data:/var/lib/redis"
+      - "./redis.conf:/usr/local/etc/redis/redis.conf"
+    ports:
+      - 6379:6379
+
+  echo-server:
+    image: takatost/laravel-echo-server
+    command: laravel-echo-server start
+    ports:
+      - 6001:6001
+
 volumes:
   db: {}
+  redis: {}

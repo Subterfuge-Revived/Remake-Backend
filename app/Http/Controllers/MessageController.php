@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChatMessageEvent;
 use App\Http\Responses\DeletedResponse;
 use App\Http\Responses\UnauthorizedResponse;
 use App\Http\Responses\UpdatedResponse;
@@ -60,6 +61,8 @@ class MessageController extends Controller
         $message->message = $request->input('message');
         $message->player()->associate($this->session->player);
         $group->messages()->save($message);
+
+        event(new ChatMessageEvent($message));
 
         return new CreatedResponse($message);
     }
