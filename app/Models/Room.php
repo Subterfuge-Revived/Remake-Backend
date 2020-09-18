@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Room
@@ -21,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property int $id
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property Carbon $deleted_at
  * @property Carbon $started_at
  * @property Carbon $closed_at
  * @property int $creator_player_id
@@ -45,6 +47,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static Builder|Room whereClosedAt($value)
  * @method static Builder|Room whereCreatedAt($value)
  * @method static Builder|Room whereCreatorPlayerId($value)
+ * @method static Builder|Room whereDeletedAt($value)
  * @method static Builder|Room whereDescription($value)
  * @method static Builder|Room whereGoalId($value)
  * @method static Builder|Room whereId($value)
@@ -63,7 +66,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class Room extends Model
 {
-    use SerializesTimestamps;
+    use SerializesTimestamps, SoftDeletes;
 
     protected $dates = [
         'started_at',
