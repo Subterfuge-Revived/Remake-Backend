@@ -22,5 +22,22 @@ services:
     env_file:
       - ./.env
 
+  db_testing:
+    image: mysql:5.7
+    volumes:
+      - "./database:/data"
+    ports:
+      - 3307:3306
+    environment:
+      DB_HOST: db_testing
+      DB_PORT: 3307
+      DB_DATABASE: testing
+      DB_USERNAME: subterfuge
+      DB_PASSWORD: subterfuge
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testing
+      MYSQL_USER: subterfuge
+      MYSQL_PASSWORD: subterfuge
+
 volumes:
   db: {}
