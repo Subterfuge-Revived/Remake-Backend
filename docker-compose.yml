@@ -5,8 +5,8 @@ services:
     build: .
     depends_on:
       - db
-    volumes:
-      - ".:/var/www"
+#    volumes:
+#      - ".:/var/www:cached"
     ports:
       - 80:80
     env_file:
