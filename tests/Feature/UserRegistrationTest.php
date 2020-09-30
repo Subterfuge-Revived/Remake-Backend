@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Player;
+use App\Models\PlayerSession;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -28,7 +29,8 @@ class UserRegistrationTest extends TestCase
         $this->assertPassesValidation($response->json(), [
             'player' => 'required',
             'player.name' => 'required|string|in:Username',
-            'player.id' => 'required|int'
+            'player.id' => 'required|int',
+            'token' => 'required|string',
         ]);
         $this->assertDatabaseHas('players', ['name' => 'Username', 'email' => 'test@example.com']);
         $this->assertTrue(Hash::check('foobar', Player::whereName('Username')->first()->password));
@@ -56,6 +58,35 @@ class UserRegistrationTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function testRegistrationFailsWithProfaneUsername()
+    {
+        foreach (['fuck', 'shit', 'damn', '{xXx b!tch69 xXx}'] as $name) {
+            $response = $this->post('/api/register', [
+                'username' => $name,
+                'email' => 'test@example.com',
+                'password' => 'barbaz',
+            ]);
+
+            $response->assertStatus(422);
+        }
+    }
+
+    public function testRegistrationCreatesASession()
+    {
+        $response = $this->post('/api/register', [
+            'username' => 'Username',
+            'email' => 'test@example.com',
+            'password' => 'foobar',
+        ]);
+
+        $token = $response->json('token');
+
+        $this->assertDatabaseHas('player_sessions', [
+            'token' => PlayerSession::hash($token),
+            'player_id' => Player::whereName('Username')->first()->id
+        ]);
+    }
+
     public function testRegistrationSucceedsWithDuplicatePassword()
     {
         Player::create(['name' => 'Somebody', 'email' => 'test@example.com', 'password' => 'foobar', 'last_online_at' => new Carbon()]);
@@ -71,7 +102,8 @@ class UserRegistrationTest extends TestCase
         $this->assertPassesValidation($response->json(), [
             'player' => 'required',
             'player.name' => 'required|string|in:Somebody else',
-            'player.id' => 'required|int'
+            'player.id' => 'required|int',
+            'token' => 'required|string',
         ]);
         $this->assertDatabaseHas('players', ['name' => 'Somebody else', 'email' => 'second_test@example.com']);
         $this->assertTrue(Hash::check('foobar', Player::whereName('Somebody else')->first()->password));
