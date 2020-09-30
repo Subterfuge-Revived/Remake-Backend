@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Player;
 use App\Models\PlayerSession;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserLoginTest extends TestCase
