@@ -25,7 +25,11 @@ class UserRegistrationTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $response->assertJson(['player' => ['name' => 'Username', 'id' => 1]]);
+        $this->assertPassesValidation($response->json(), [
+            'player' => 'required',
+            'player.name' => 'required|string|in:Username',
+            'player.id' => 'required|int'
+        ]);
         $this->assertDatabaseHas('players', ['name' => 'Username', 'email' => 'test@example.com']);
         $this->assertTrue(Hash::check('foobar', Player::whereName('Username')->first()->password));
     }
@@ -50,6 +54,11 @@ class UserRegistrationTest extends TestCase
 
         // E-mail address already taken
         $response->assertStatus(422);
+    }
+
+    public function testRegistrationSucceedsWithDuplicatePassword()
+    {
+        Player::create(['name' => 'Somebody', 'email' => 'test@example.com', 'password' => 'foobar', 'last_online_at' => new Carbon()]);
 
         $response = $this->post('/api/register', [
             'username' => 'Somebody else',
@@ -59,7 +68,11 @@ class UserRegistrationTest extends TestCase
 
         // Using the same password as another player is, of course, allowed
         $response->assertStatus(200);
-        $response->assertJson(['player' => ['name' => 'Somebody else', 'id' => 2]]);
+        $this->assertPassesValidation($response->json(), [
+            'player' => 'required',
+            'player.name' => 'required|string|in:Somebody else',
+            'player.id' => 'required|int'
+        ]);
         $this->assertDatabaseHas('players', ['name' => 'Somebody else', 'email' => 'second_test@example.com']);
         $this->assertTrue(Hash::check('foobar', Player::whereName('Somebody else')->first()->password));
     }
