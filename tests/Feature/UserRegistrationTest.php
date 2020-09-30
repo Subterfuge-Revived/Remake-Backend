@@ -5,12 +5,13 @@ namespace Tests\Feature;
 use App\Models\Player;
 use App\Models\PlayerSession;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class UserRegistrationTest extends TestCase
 {
-//    use RefreshDatabase;
+    use RefreshDatabase;
 
     /**
      * A basic test example.
