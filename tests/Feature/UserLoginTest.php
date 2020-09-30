@@ -11,11 +11,6 @@ class UserLoginTest extends TestCase
 {
     use RefreshDatabase;
 
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
     public function testSuccessfulLogin()
     {
         /** @var Player $player */
