@@ -68,6 +68,12 @@ class Room extends Model
 {
     use SerializesTimestamps, SoftDeletes;
 
+    // A room needs this amount of players to start
+    const MINIMUM_NUM_PLAYERS = 2;
+
+    // A room can maximally contain this amount of players
+    const MAXIMUM_NUM_PLAYERS = 10;
+
     protected $dates = [
         'started_at',
         'closed_at',
