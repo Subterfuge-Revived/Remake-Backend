@@ -22,5 +22,7 @@ RUN echo "reset -w" >> /root/.bashrc
 WORKDIR /var/www
 COPY . /var/www
 
+RUN composer install
+
 EXPOSE 80
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+CMD php artisan serve --host=0.0.0.0 --port=80
