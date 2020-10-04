@@ -5,8 +5,14 @@ services:
     build: .
     depends_on:
       - db
-#    volumes:
-#      - ".:/var/www:cached"
+
+    # If you find your local environment to be very slow, it might be due to this volume mount.
+    # This occurs in particular if you are running this codebase on a Windows host machine.
+    # The sync of the mount's files causes a slowdown of the application.
+    # Disable the mount, re-up the container and run ./sync.sh to manually sync changed files
+    # into the container when you want to see their effect.
+    volumes:
+      - ".:/var/www"
     ports:
       - 80:80
     env_file:
