@@ -3,9 +3,9 @@ FROM php:7.4-cli
 
 RUN apt-get update -y
 
-# Update and install Git and VIM + necessary packages
+# Update and install necessary packages
 RUN apt-get install -y --no-install-recommends \
-    git zip unzip vim ssh zlib1g-dev libicu-dev libzip-dev cron libmcrypt-dev && \
+    git zip unzip ssh zlib1g-dev libicu-dev libzip-dev cron libmcrypt-dev && \
     apt-get clean && \
     docker-php-ext-install pdo pdo_mysql pcntl zip bcmath intl && \
     docker-php-ext-enable opcache
