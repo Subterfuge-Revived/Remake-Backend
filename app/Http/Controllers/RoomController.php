@@ -86,7 +86,7 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'max_players' => 'required|int|between:2,10',
+            'max_players' => "required|int|between:" . Room::MINIMUM_NUM_PLAYERS . "," . Room::MAXIMUM_NUM_PLAYERS,
             'goal' => 'required|string|' . Rule::in(Goal::pluck('identifier')),
             'description' => 'required|string',
             'map' => 'required|int|between:0,3',

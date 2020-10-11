@@ -5,6 +5,12 @@ services:
     build: .
     depends_on:
       - db
+
+    # If you find your local environment to be very slow, it might be due to this volume mount.
+    # This occurs in particular if you are running this codebase on a Windows host machine.
+    # The sync of the mount's files causes a slowdown of the application.
+    # Disable the mount, re-up the container and run ./sync.sh to manually sync changed files
+    # into the container when you want to see their effect.
     volumes:
       - ".:/var/www"
     ports:
@@ -21,6 +27,23 @@ services:
       - 3306:3306
     env_file:
       - ./.env
+
+  db_testing:
+    image: mysql:5.7
+    volumes:
+      - "./database:/data"
+    ports:
+      - 3307:3306
+    environment:
+      DB_HOST: db_testing
+      DB_PORT: 3307
+      DB_DATABASE: testing
+      DB_USERNAME: subterfuge
+      DB_PASSWORD: subterfuge
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: testing
+      MYSQL_USER: subterfuge
+      MYSQL_PASSWORD: subterfuge
 
 volumes:
   db: {}
