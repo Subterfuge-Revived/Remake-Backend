@@ -40,4 +40,14 @@ class RoomTest extends TestCase
         // Room has finished
         $this->assertFalse($room->isOngoing());
     }
+
+    public function testANewRoomHasNotStarted()
+    {
+        $player = factory(Player::class)->make();
+        $player->save();
+        /** @var Room $room */
+        list($room, $goal) = $this->createRoomWithGoal($player);
+
+        $this->assertFalse($room->hasStarted());
+    }
 }
