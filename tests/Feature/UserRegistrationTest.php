@@ -34,20 +34,23 @@ class UserRegistrationTest extends TestCase
 
     public function testRegistrationFailsWithDuplicatedData()
     {
-        Player::create(['name' => 'Somebody', 'email' => 'test@example.com', 'password' => 'foobar', 'last_online_at' => new Carbon()]);
+        /** @var Player $player */
+        $player = factory(Player::class)->make();
+        $player->save();
+
         $response = $this->post('/api/register', [
-            'username' => 'Somebody',
-            'email' => 'second_test@example.com',
-            'password' => 'barbaz',
+            'username' => $player->name,
+            'email' => 'zzz' . $player->email,
+            'password' => 'yyy' . $player->password,
         ]);
 
         // Username already taken
         $response->assertStatus(422);
 
         $response = $this->post('/api/register', [
-            'username' => 'Somebody else',
-            'email' => 'test@example.com',
-            'password' => 'barbaz',
+            'username' => $player->name . ' the Second',
+            'email' => $player->email,
+            'password' => 'yyy' . $player->password,
         ]);
 
         // E-mail address already taken
@@ -85,11 +88,13 @@ class UserRegistrationTest extends TestCase
 
     public function testRegistrationSucceedsWithDuplicatePassword()
     {
-        Player::create(['name' => 'Somebody', 'email' => 'test@example.com', 'password' => 'foobar', 'last_online_at' => new Carbon()]);
+        /** @var Player $player */
+        $player = factory(Player::class)->make();
+        $player->save();
 
         $response = $this->post('/api/register', [
-            'username' => 'Somebody else',
-            'email' => 'second_test@example.com',
+            'username' => $player->name . ' the Second',
+            'email' => 'yyy' . $player->email,
             'password' => 'foobar',
         ]);
 
@@ -97,11 +102,11 @@ class UserRegistrationTest extends TestCase
         $response->assertStatus(200);
         $this->assertPassesValidation($response->json(), [
             'player' => 'required',
-            'player.name' => 'required|string|in:Somebody else',
+            'player.name' => "required|string|in:{$player->name} the Second",
             'player.id' => 'required|int',
             'token' => 'required|string',
         ]);
-        $this->assertDatabaseHas('players', ['name' => 'Somebody else', 'email' => 'second_test@example.com']);
-        $this->assertTrue(Hash::check('foobar', Player::whereName('Somebody else')->first()->password));
+        $this->assertDatabaseHas('players', ['name' => "{$player->name} the Second", 'email' => "yyy{$player->email}"]);
+        $this->assertTrue(Hash::check('foobar', Player::whereName("{$player->name} the Second")->first()->password));
     }
 }

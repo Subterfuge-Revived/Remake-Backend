@@ -16,7 +16,6 @@ class UserLoginTest extends TestCase
         /** @var Player $player */
         $player = factory(Player::class)->make();
         $player->save();
-        $player->refresh();
 
         $response = $this->post('/api/login', [
             'username' => $player->name,
@@ -38,7 +37,6 @@ class UserLoginTest extends TestCase
         /** @var Player $player */
         $player = factory(Player::class)->make();
         $player->save();
-        $player->refresh();
 
         $response = $this->post('/api/login', [
             'username' => $player->name,
